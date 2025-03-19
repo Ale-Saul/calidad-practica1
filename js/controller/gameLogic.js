@@ -21,15 +21,15 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
     };
     
 
-    var addScore = function addScore(add) {
+    const addScore = function addScore(add) {
         Character.ship.player.score += add;
     };
 
-    var stopTimer = function stopTimer() {
+    const stopTimer = function stopTimer() {
         clearInterval(timerInterval);
     };
 
-    var getTimer = function getTimer() {
+    const getTimer = function getTimer() {
         return Game.timer;
     };
 
