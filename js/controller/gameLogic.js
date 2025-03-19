@@ -33,7 +33,7 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         return Game.timer;
     };
 
-    var timer = {
+    const timer = {
         reset: resetTimer,
         start: startTimer,
         stop: stopTimer,
@@ -51,10 +51,10 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         }, 3000);
     };
 
-    var checkEnemiesDead = function checkEnemiesDead() {
-        var alive = 0;
-        var enemies = InPlay.enemies;
-        var i;
+    const checkEnemiesDead = function checkEnemiesDead() {
+        let alive = 0;
+        const enemies = InPlay.enemies;
+        let i;
         if (enemies.length > 0 && !Game.gameOver) {
             for (i = 0; i < enemies.length; i++) {
                 if (enemies[i].alive) {
@@ -71,12 +71,12 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         }
     };
 
-    var checkBulletCollision = function checkBulletCollision() {
-        var bullet, ship;
-        var enemyBullets = InPlay.enemyBullets;
-        var playerPos = Character.ship.player.pos;
-        var playerBullets = InPlay.playerBullets;
-        var enemies = InPlay.enemies;
+    const checkBulletCollision = function checkBulletCollision() {
+        let bullet, ship;
+        const enemyBullets = InPlay.enemyBullets;
+        const playerPos = Character.ship.player.pos;
+        const playerBullets = InPlay.playerBullets;
+        const enemies = InPlay.enemies;
         for (bullet = 0; bullet < playerBullets.length; bullet++) {
             if (playerBullets[bullet].alive) {
                 for (ship = 0; ship < enemies.length; ship++) {
