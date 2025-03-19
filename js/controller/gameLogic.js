@@ -71,69 +71,89 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         }
     };
 
-    const checkBulletCollision = function checkBulletCollision() {
-        let bullet, ship;
-        const enemyBullets = InPlay.enemyBullets;
+    const checkBulletCollision = () => {
         const playerPos = Character.ship.player.pos;
         const playerBullets = InPlay.playerBullets;
+        const enemyBullets = InPlay.enemyBullets;
         const enemies = InPlay.enemies;
-        for (bullet = 0; bullet < playerBullets.length; bullet++) {
-            if (playerBullets[bullet].alive) {
-                for (ship = 0; ship < enemies.length; ship++) {
-                    if (enemies[ship].alive) {
-                        if (playerBullets[bullet].x >= enemies[ship].x && playerBullets[bullet].x <= enemies[ship].x + enemies[ship].width) {
-                            if (playerBullets[bullet].y >= (enemies[ship].y - 9) && playerBullets[bullet].y <= enemies[ship].y + enemies[ship].height) {
-                                playerBullets[bullet].alive = false;
-                                enemies[ship].hp -= playerBullets[bullet].damage;
-                                if (enemies[ship].hp <= 0) {
-                                    if (!Game.muteSFX) {
-                                        Sounds.death.play();
-                                    }
-                                    enemies[ship].alive = false;
-                                    GameLogic.addScore(enemies[ship].score);
-                                    if (enemies[ship].name === "transport") {
-                                        GameLogic.dropPickUp(enemies[ship].x, enemies[ship].y);
-                                        Game.transport += 1;
-                                    }
-                                    if (enemies[ship].name === "scout") {
-                                        Game.scout += 1;
-                                    }
-                                    if (enemies[ship].name === "fighter") {
-                                        Game.fighter += 1;
-                                    }
-                                    if (enemies[ship].name === "interceptor") {
-                                        Game.interceptor += 1;
-                                    }
-                                    if (enemies[ship].name === "tank") {
-                                        Game.tank += 1;
-                                    }
-                                }
-                            }
-                        }
+    
+        playerBullets.forEach(bullet => {
+            if (bullet.alive) {
+                enemies.forEach(enemy => {
+                    if (enemy.alive && checkCollision(bullet, enemy)) {
+                        handlePlayerBulletHit(bullet, enemy);
                     }
-                }
+                });
             }
-        }
-        for (bullet = 0; bullet < enemyBullets.length; bullet++) {
-            if (enemyBullets[bullet].alive) {
-                if (enemyBullets[bullet].x >= playerPos.x - 13 && enemyBullets[bullet].x <= playerPos.x + Character.ship.player.width) {
-                    if (enemyBullets[bullet].y >= playerPos.y - Character.ship.player.height / 2 && enemyBullets[bullet].y <= playerPos.y + Character.ship.player.height / 2) {
-                        if (!Game.muteSFX) {
-                            Sounds.playerHit.play();
-                        }
-                        enemyBullets[bullet].alive = false;
-                        Character.ship.player.hp -= enemyBullets[bullet].damage;
-                        if (Character.ship.player.hp <= 0) {
-                            if (!Game.muteSFX) {
-                                Sounds.explosion.play();
-                            }
-                            GameLogic.gameOver();
-                        }
-                    }
-                }
+        });
+    
+        enemyBullets.forEach(bullet => {
+            if (bullet.alive && checkPlayerBulletHit(bullet, playerPos)) {
+                handleEnemyBulletHit(bullet);
             }
+        });
+    };
+    
+    const checkCollision = (bullet, enemy) => {
+        return bullet.x >= enemy.x && bullet.x <= enemy.x + enemy.width &&
+               bullet.y >= (enemy.y - 9) && bullet.y <= enemy.y + enemy.height;
+    };
+    
+    const handlePlayerBulletHit = (bullet, enemy) => {
+        bullet.alive = false;
+        enemy.hp -= bullet.damage;
+    
+        if (enemy.hp <= 0) {
+            if (!Game.muteSFX) {
+                Sounds.death.play();
+            }
+            enemy.alive = false;
+            GameLogic.addScore(enemy.score);
+            handleEnemyType(enemy);
         }
     };
+    
+    const handleEnemyType = (enemy) => {
+        switch (enemy.name) {
+            case "transport":
+                GameLogic.dropPickUp(enemy.x, enemy.y);
+                Game.transport += 1;
+                break;
+            case "scout":
+                Game.scout += 1;
+                break;
+            case "fighter":
+                Game.fighter += 1;
+                break;
+            case "interceptor":
+                Game.interceptor += 1;
+                break;
+            case "tank":
+                Game.tank += 1;
+                break;
+        }
+    };
+    
+    const checkPlayerBulletHit = (bullet, playerPos) => {
+        return bullet.x >= playerPos.x - 13 && bullet.x <= playerPos.x + Character.ship.player.width &&
+               bullet.y >= playerPos.y - Character.ship.player.height / 2 && bullet.y <= playerPos.y + Character.ship.player.height / 2;
+    };
+    
+    const handleEnemyBulletHit = (bullet) => {
+        if (!Game.muteSFX) {
+            Sounds.playerHit.play();
+        }
+        bullet.alive = false;
+        Character.ship.player.hp -= bullet.damage;
+    
+        if (Character.ship.player.hp <= 0) {
+            if (!Game.muteSFX) {
+                Sounds.explosion.play();
+            }
+            GameLogic.gameOver();
+        }
+    };
+    
 
     var dropPickUp = function dropPickUp(x, y) {
         var selector;
