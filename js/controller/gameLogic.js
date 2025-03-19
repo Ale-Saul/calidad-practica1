@@ -1,6 +1,6 @@
 define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/sounds", "model/images", "controller/localStorageManager"], function (Game, Character, InPlay, Canvas, Sounds, Images, LSM) {
-    var timerInterval;
-    var resetTimer = function resetTimer() {
+    let timerInterval;
+    const resetTimer = function resetTimer() {
         Game.timer = 0;
     };
 
@@ -9,9 +9,7 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
             Clone.prototype = obj;
             return new Clone();
         };
-
-        function Clone() {}
-    }());
+    })();
 
     var startTimer = function startTimer() {
         timerInterval = setInterval(function () {
