@@ -58,8 +58,14 @@ nav#buttons a{
 	background: -moz-linear-gradient(top, #136caa, #4f98cb);
 	background: -o-linear-gradient(top, #136caa, #4f98cb);
 	background: -ms-linear-gradient(top, #136caa, #4f98cb);
-	background: linear-gradient(top, #136caa, #4f98cb);
-
+	.foo {
+		background: -webkit-linear-gradient(top, #136caa, #4f98cb);
+		background: linear-gradient(to top, #136caa, #4f98cb);
+	  }
+	  
+	  .bar {
+		background: linear-gradient(45deg, #136caa, #4f98cb);
+	  }
 	/*add a drop shadow to the button*/
 	-webkit-box-shadow: rgba(93, 100, 106, .75) 0 1px 10px;
 	-moz-box-shadow: rgba(93, 100, 106, .75) 0 1px 10px;

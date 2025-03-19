@@ -294,18 +294,19 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         }
         var time = 0;
         GameLogic.level.startTime = Game.timer;
-        for (i = 0; i < noEnemies; i++) {
+        var enemiesAdded = 0;
+        while (enemiesAdded < noEnemies) {
             selector = Math.floor(Math.random() * (lvlSelector - 1 + 1) + 1);
             if (selector === 1) {
                 enemy = GameLogic.clone(Character.ship.enemy.scout);
             } else if (selector === 2) {
                 enemy = GameLogic.clone(Character.ship.enemy.fighter);
             } else if (selector === 3) {
-				if (Game.level % 3 === 0) {
-					enemy = GameLogic.clone(Character.ship.enemy.transport);
-				} else {
-					enemy = GameLogic.clone(Character.ship.enemy.scout);
-				}
+                if (Game.level % 3 === 0) {
+                    enemy = GameLogic.clone(Character.ship.enemy.transport);
+                } else {
+                    enemy = GameLogic.clone(Character.ship.enemy.scout);
+                }
             } else if (selector === 4) {
                 enemy = GameLogic.clone(Character.ship.enemy.tank);
             } else if (selector === 5) {
@@ -316,12 +317,11 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
                 x = Canvas.canvasWidth + 100;
                 enemy.y = y;
                 enemy.x = x;
-				enemy.hp += Game.level * (Math.floor(Game.level / 2) - 1);
+                enemy.hp += Game.level * (Math.floor(Game.level / 2) - 1);
                 enemy.time = time;
                 time += rate;
                 InPlay.enemies.push(enemy);
-            } else {
-                i--;
+                enemiesAdded++;
             }
         }
     };
