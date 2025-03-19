@@ -1,6 +1,6 @@
-projectKey=Proyecto_practica_1_calidad
+projectKey=Space-Shooter
 serverUrl=http://localhost:9000
-serverVersion=25.3.0.104237
-dashboardUrl=http://localhost:9000/dashboard?id=Proyecto_practica_1_calidad
-ceTaskId=d9a9b150-c6ee-4842-adb4-97e5eb35e067
-ceTaskUrl=http://localhost:9000/api/ce/task?id=d9a9b150-c6ee-4842-adb4-97e5eb35e067
+serverVersion=9.9.1.69595
+dashboardUrl=http://localhost:9000/dashboard?id=Space-Shooter
+ceTaskId=AZXFVpl5FjaYXLOe94f8
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AZXFVpl5FjaYXLOe94f8
