@@ -4,21 +4,22 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         Game.timer = 0;
     };
 
-    var clone = (function () {
+    const clone = (function () {
         return function (obj) {
             Clone.prototype = obj;
             return new Clone();
         };
     })();
 
-    var startTimer = function startTimer() {
-        timerInterval = setInterval(function () {
+    const startTimer = () => {
+        timerInterval = setInterval(() => {
             if (Game.levelStarted) {
                 Game.timer += 0.01;
                 GameLogic.addScore(2);
             }
         }, 10);
     };
+    
 
     var addScore = function addScore(add) {
         Character.ship.player.score += add;
@@ -39,7 +40,7 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         get: getTimer
     };
 
-    var startLevel = function startLevel() {
+    const startLevel = function startLevel() {
         setTimeout(function () {
             if (!Game.muteSFX) {
                 Sounds.levelUp.play();
