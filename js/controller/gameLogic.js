@@ -155,10 +155,9 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
     };
     
 
-    var dropPickUp = function dropPickUp(x, y) {
-        var selector;
-        selector = Math.floor(Math.random() * (3 - 1 + 1) + 1);
-        var pickUp = {
+    const dropPickUp = function dropPickUp(x, y) {
+        const selector = Math.floor(Math.random() * (3 - 1 + 1) + 1);
+        const pickUp = {
             x: x,
             y: y + 45,
             alive: true
