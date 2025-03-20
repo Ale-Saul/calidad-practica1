@@ -1,9 +1,9 @@
 define([], function () {
     var InPlay = {
-        enemies: enemies = [],
-        playerBullets: playerBullets = [],
-        enemyBullets: enemyBullets = [],
-        powerUps: powerUps = []
+        enemies: [],
+        playerBullets: [],
+        enemyBullets: [],
+        powerUps: []
     };
     return InPlay;
 });
