@@ -268,19 +268,21 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
     };
     
 
-    var uploadStats = function uploadStats(isHighscore) {
+    const uploadStats = function uploadStats(isHighscore) {
         if (isHighscore) {
             LSM.set("highscore", Game.highscore);
             Game.isHighscore = true;
         } else {
             Game.isHighscore = false;
         }
+    
         LSM.set("scout", Game.scout);
         LSM.set("fighter", Game.fighter);
         LSM.set("interceptor", Game.interceptor);
         LSM.set("tank", Game.tank);
         LSM.set("transport", Game.transport);
     };
+    
 
     var resetStats = function resetStats() {
         Game.highscore = 0;
