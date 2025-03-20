@@ -250,20 +250,23 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
     };
     
 
-    var gameOver = function gameOver() {
-        var isHighscore = false;
-        var enemies = InPlay.enemies;
+    const gameOver = function gameOver() { 
+        const isHighscore = false; 
+        const enemies = InPlay.enemies; 
         GameLogic.timer.stop();
         enemies.length = 0;
         Game.levelStarted = false;
         Game.gameOver = true;
+    
         if (Game.highscore < Character.ship.player.score) {
             isHighscore = true;
             Game.highscore = Character.ship.player.score;
         }
+    
         GameLogic.uploadStats(isHighscore);
         Game.screen = "game_over";
     };
+    
 
     var uploadStats = function uploadStats(isHighscore) {
         if (isHighscore) {
