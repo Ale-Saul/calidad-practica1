@@ -284,7 +284,7 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
     };
     
 
-    var resetStats = function resetStats() {
+    const resetStats = function resetStats() {
         Game.highscore = 0;
         Game.scout = 0;
         Game.fighter = 0;
@@ -299,24 +299,24 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         LSM.set("transport", 0);
     };
 
-    var checkCollisions = function checkCollisions() {
+    const checkCollisions = function checkCollisions() {
         GameLogic.checkShipCollision();
         GameLogic.checkBulletCollision();
         GameLogic.checkEnemiesDead();
         GameLogic.checkPickUp();
     };
 
-    var spawnCheck = function spawnCheck(newShip, spawnTime) {
-        var i, enemies, spawningY, verdict, time;
-        verdict = true;
-        time = spawnTime;
-        spawningY = newShip;
-        enemies = InPlay.enemies;
+    const spawnCheck = function spawnCheck(newShip, spawnTime) {
+        let verdict = true;
+        let time = spawnTime;
+        let spawningY = newShip;
+        const enemies = InPlay.enemies;
         if (enemies.length >= 1) {
-            for (i = 0; i < enemies.length; i++) {
+            for (let i = 0; i < enemies.length; i++) {
                 if (time < enemies[i].time + 1) {
                     if (spawningY > enemies[i].y - 104 && spawningY < enemies[i].y + 104) {
                         verdict = false;
+                        break;
                     }
                 }
             }
