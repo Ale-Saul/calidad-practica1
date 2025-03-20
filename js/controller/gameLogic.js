@@ -324,52 +324,50 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         return verdict;
     };
 
-    var addEnemies = function addEnemies() {
-        var i, enemy, x, y, noEnemies, rate, selector, lvlSelector;
-        noEnemies = Game.level * 5;
-        if (Game.level <= 5) {
-            lvlSelector = Game.level;
-        } else {
-            lvlSelector = 5;
-        }
-        if (Game.level < 6) {
-            rate = 1;
-        } else {
-            rate = 0.5;
-        }
-        var time = 0;
+    const addEnemies = function addEnemies() {
+        const noEnemies = Game.level * 5;
+        const lvlSelector = Game.level <= 5 ? Game.level : 5;
+        const rate = Game.level < 6 ? 1 : 0.5;
+        let time = 0;
+        let enemiesAdded = 0;
         GameLogic.level.startTime = Game.timer;
-        var enemiesAdded = 0;
+    
         while (enemiesAdded < noEnemies) {
-            selector = Math.floor(Math.random() * (lvlSelector - 1 + 1) + 1);
-            if (selector === 1) {
-                enemy = GameLogic.clone(Character.ship.enemy.scout);
-            } else if (selector === 2) {
-                enemy = GameLogic.clone(Character.ship.enemy.fighter);
-            } else if (selector === 3) {
-                if (Game.level % 3 === 0) {
-                    enemy = GameLogic.clone(Character.ship.enemy.transport);
-                } else {
-                    enemy = GameLogic.clone(Character.ship.enemy.scout);
-                }
-            } else if (selector === 4) {
-                enemy = GameLogic.clone(Character.ship.enemy.tank);
-            } else if (selector === 5) {
-                enemy = GameLogic.clone(Character.ship.enemy.interceptor);
-            }
-            y = Math.floor(Math.random() * (Canvas.canvasHeight - 90)) + 1;
+            const enemy = createEnemy(lvlSelector);
+            const y = Math.floor(Math.random() * (Canvas.canvasHeight - 90)) + 1;
+            
             if (GameLogic.spawnCheck(y, time)) {
-                x = Canvas.canvasWidth + 100;
-                enemy.y = y;
-                enemy.x = x;
-                enemy.hp += Game.level * (Math.floor(Game.level / 2) - 1);
-                enemy.time = time;
+                const x = Canvas.canvasWidth + 100;
+                setupEnemy(enemy, x, y, time, rate);
                 time += rate;
                 InPlay.enemies.push(enemy);
                 enemiesAdded++;
             }
         }
     };
+    
+    const createEnemy = (lvlSelector) => {
+        const selector = Math.floor(Math.random() * lvlSelector) + 1;
+        switch (selector) {
+            case 1: return GameLogic.clone(Character.ship.enemy.scout);
+            case 2: return GameLogic.clone(Character.ship.enemy.fighter);
+            case 3: 
+                return Game.level % 3 === 0 
+                    ? GameLogic.clone(Character.ship.enemy.transport) 
+                    : GameLogic.clone(Character.ship.enemy.scout);
+            case 4: return GameLogic.clone(Character.ship.enemy.tank);
+            case 5: return GameLogic.clone(Character.ship.enemy.interceptor);
+            default: return GameLogic.clone(Character.ship.enemy.scout); 
+        }
+    };
+    
+    const setupEnemy = (enemy, x, y, time, rate) => {
+        enemy.x = x;
+        enemy.y = y;
+        enemy.hp += Game.level * (Math.floor(Game.level / 2) - 1);
+        enemy.time = time;
+    };
+    
 
     var level = {
         //functions
