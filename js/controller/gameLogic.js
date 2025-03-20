@@ -212,32 +212,43 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
     };
     
 
-    var checkShipCollision = function checkShipCollision() {
-        var enemies = InPlay.enemies;
-        var player = Character.ship.player;
-        var playerPos = Character.ship.player.pos;
-        var ship;
-        for (ship = 0; ship < enemies.length; ship++) {
-            if (Character.ship.player.hp > 0 && enemies[ship].alive) {
-                if ((enemies[ship].x >= playerPos.x && enemies[ship].x <= (playerPos.x + player.width)) || (enemies[ship].x + enemies[ship].width >= playerPos.x && enemies[ship].x + enemies[ship].width <= (playerPos.x + player.width))) {
-                    if ((enemies[ship].y >= (playerPos.y - player.height) && enemies[ship].y <= (playerPos.y + player.height / 2)) || ((playerPos.y - player.height / 2) >= enemies[ship].y && (playerPos.y - player.height / 2) <= (enemies[ship].y + enemies[ship].height))) {
-                        if (!Game.muteSFX) {
-                            Sounds.playerHit.play();
-                            Sounds.death.play();
-                        }
-                        enemies[ship].alive = false;
-                        Character.ship.player.hp -= enemies[ship].hp;
-                        if (Character.ship.player.hp <= 0) {
-                            if (!Game.muteSFX) {
-                                Sounds.explosion.play();
-                            }
-                            GameLogic.gameOver();
-                        }
-                    }
-                }
+    const checkShipCollision = () => {
+        const player = Character.ship.player;
+        const playerPos = player.pos;
+    
+        InPlay.enemies.forEach(enemy => {
+            if (enemy.alive && player.hp > 0 && isColliding(playerPos, player, enemy)) {
+                handleCollision(enemy, player);
             }
+        });
+    };
+    
+    const isColliding = (playerPos, player, enemy) => {
+        const isXColliding = (enemy.x >= playerPos.x && enemy.x <= playerPos.x + player.width) || 
+                             (enemy.x + enemy.width >= playerPos.x && enemy.x + enemy.width <= playerPos.x + player.width);
+        const isYColliding = (enemy.y >= playerPos.y - player.height && enemy.y <= playerPos.y + player.height / 2) ||
+                             (playerPos.y - player.height / 2 >= enemy.y && playerPos.y - player.height / 2 <= enemy.y + enemy.height);
+    
+        return isXColliding && isYColliding;
+    };
+    
+    const handleCollision = (enemy, player) => {
+        if (!Game.muteSFX) {
+            Sounds.playerHit.play();
+            Sounds.death.play();
+        }
+    
+        enemy.alive = false;
+        player.hp -= enemy.hp;
+    
+        if (player.hp <= 0) {
+            if (!Game.muteSFX) {
+                Sounds.explosion.play();
+            }
+            GameLogic.gameOver();
         }
     };
+    
 
     var gameOver = function gameOver() {
         var isHighscore = false;
