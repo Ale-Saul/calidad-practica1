@@ -369,15 +369,15 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
     };
     
 
-    var level = {
-        //functions
+    const level = {
+        // functions
         start: startLevel,
-        //variables
+        // variables
         startTime: 0
     };
-
-    var GameLogic = {
-        //functions
+    
+    const GameLogic = {
+        // functions
         clone: clone,
         spawnCheck: spawnCheck,
         addEnemies: addEnemies,
@@ -391,11 +391,13 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         gameOver: gameOver,
         uploadStats: uploadStats,
         resetStats: resetStats,
-        //variables
+        // variables
         paused: false,
-	fRate: false,
+        fRate: false,
         level: level,
         timer: timer
     };
+    
     return GameLogic;
+    
 });
