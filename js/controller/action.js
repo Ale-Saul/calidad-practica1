@@ -1,5 +1,4 @@
 define(["model/dependencies"], function(deps) {
-    var shooting;
     var getMousePos = function getMousePos(evt) {
         deps.Game.keyboard.use = false;
         deps.Game.mouse.use = true;
@@ -262,7 +261,7 @@ define(["model/dependencies"], function(deps) {
 
     var Action = {
         moveShip: moveShip,
-        shooting: shooting,
+        shooting: null,
         mouseClicked: mouseClicked,
         playerShoot: playerShoot,
         enemyShoot: enemyShoot,
