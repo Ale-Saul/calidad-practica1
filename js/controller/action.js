@@ -1,53 +1,50 @@
-define(["model/game", "model/canvas", "model/character", "model/images", "model/inPlay", "controller/gameLogic", "model/sounds", "controller/localStorageManager"],
-    function (Game, Canvas, Character, Images, InPlay, GameLogic, Sounds, LSM) {
-        var shooting;
-        var getMousePos = function getMousePos(evt) {
-            Game.keyboard.use = false;
-            Game.mouse.use = true;
-            var rect = Canvas.canvas.getBoundingClientRect();
-            Game.mouse.pos.x = evt.clientX - rect.left;
-            Game.mouse.pos.y = evt.clientY - rect.top;
-            Character.ship.player.pos.y = Game.mouse.pos.y;
-            if (Game.mouse.pos.x <= 0 || Game.mouse.pos.x >= Canvas.canvasWidth || Game.mouse.pos.y <= 0 || Game.mouse.pos.y >= Canvas.canvasHeight) {
-                clearInterval(Action.shooting);
-            }
-        };
+define(["model/dependencies"], function(deps) {
+    var shooting;
+    var getMousePos = function getMousePos(evt) {
+        deps.Game.keyboard.use = false;
+        deps.Game.mouse.use = true;
+        var rect = deps.Canvas.canvas.getBoundingClientRect();
+        deps.Game.mouse.pos.x = evt.clientX - rect.left;
+        deps.Game.mouse.pos.y = evt.clientY - rect.top;
+        deps.Character.ship.player.pos.y = deps.Game.mouse.pos.y;
+        if (deps.Game.mouse.pos.x <= 0 || deps.Game.mouse.pos.x >= deps.Canvas.canvasWidth || deps.Game.mouse.pos.y <= 0 || deps.Game.mouse.pos.y >= deps.Canvas.canvasHeight) {
+            clearInterval(Action.shooting);
+        }
+    };
 
-        var resize = function resize() {
-            Canvas.contextCanvasWidth = window.innerWidth;
-            Canvas.contextCanvasHeight = window.innerHeight - 70;
-            Canvas.canvasWidth = Canvas.canvas.width;
-            Canvas.canvasHeight = Canvas.canvas.height;
-            canvas = document.getElementById("gameCanvas");
-            context = canvas.getContext("2d");
-            context.canvas.width = window.innerWidth;
-            context.canvas.height = window.innerHeight - 70;
-            canvasWidth = canvas.width;
-            canvasHeight = canvas.height;
-        };
+    var resize = function resize() {
+        deps.Canvas.contextCanvasWidth = window.innerWidth;
+        deps.Canvas.contextCanvasHeight = window.innerHeight - 70;
+        deps.Canvas.canvasWidth = deps.Canvas.canvas.width;
+        deps.Canvas.canvasHeight = deps.Canvas.canvas.height;
+        var canvas = document.getElementById("gameCanvas");
+        var context = canvas.getContext("2d");
+        context.canvas.width = window.innerWidth;
+        context.canvas.height = window.innerHeight - 70;
+    };
 
-        var mouseClicked = function mouseClicked(down, kb) {
-            Game.keyboard.use = false;
-            Game.mouse.use = true;
-            switch (Game.screen) {
+    var mouseClicked = function mouseClicked(down, kb) {
+        deps.Game.keyboard.use = false;
+        deps.Game.mouse.use = true;
+        switch (deps.Game.screen) {
             case "main_menu":
                 if (down && !kb) {
                     Action.mainMenuButtonCheck();
                 }
                 break;
-                case "game":
-                    if (down && !Game.keyboard.sbFlag) {					
-                        Game.keyboard.sbFlag = true;
-                        Action.shooting = setInterval(function () {
-                            if (Character.ship.player.hp > 0) {
-                                Action.playerShoot();
-                            }
-                        }, 100); 
-                    } else if (!down) {
-                        clearInterval(Action.shooting);
-                        Game.keyboard.sbFlag = false;
-                    }
-                    break;
+            case "game":
+                if (down && !deps.Game.keyboard.sbFlag) {
+                    deps.Game.keyboard.sbFlag = true;
+                    Action.shooting = setInterval(function () {
+                        if (deps.Character.ship.player.hp > 0) {
+                            Action.playerShoot();
+                        }
+                    }, 100);
+                } else if (!down) {
+                    clearInterval(Action.shooting);
+                    deps.Game.keyboard.sbFlag = false;
+                }
+                break;
             case "game_over":
                 if (down && !kb) {
                     Action.gameOverButtonCheck();
@@ -63,242 +60,220 @@ define(["model/game", "model/canvas", "model/character", "model/images", "model/
                     Action.statsButtonCheck();
                 }
                 break;
+        }
+    };
+
+    var moveShip = function moveShip() {
+        if (deps.Game.keyboard.use) {
+            if (deps.Game.keyboard.up && deps.Character.ship.player.pos.y >= 10) {
+                deps.Character.ship.player.pos.y -= 10;
+            } else if (deps.Game.keyboard.down && deps.Character.ship.player.pos.y <= deps.Canvas.canvasHeight - 14) {
+                deps.Character.ship.player.pos.y += 10;
             }
+        }
+    };
+
+    var gameOverButtonCheck = function gameOverButtonCheck() {
+        var part1 = deps.Canvas.canvasWidth / 4;
+        var part2 = deps.Canvas.canvasHeight / 4;
+        var mouseX = deps.Game.mouse.pos.x;
+        var mouseY = deps.Game.mouse.pos.y;
+        if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.95 && mouseY >= part2 && mouseY <= part2 * 1.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            Action.resetVariables();
+            deps.Game.screen = "game";
+            deps.GameLogic.level.start();
+        }
+        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 && mouseY <= part2 * 1.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            deps.Game.screen = "main_menu";
+        }
+    };
+
+    var optionsButtonCheck = function optionsButtonCheck() {
+        var part1 = deps.Canvas.canvasWidth / 4;
+        var part2 = deps.Canvas.canvasHeight / 4;
+        var mouseX = deps.Game.mouse.pos.x;
+        var mouseY = deps.Game.mouse.pos.y;
+        if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.95 && mouseY >= part2 && mouseY <= part2 * 1.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            if (deps.Game.muteMusic === false) {
+                deps.Game.muteMusic = true;
+                deps.LSM.set("music", "false");
+                deps.Sounds.bgMusic.mute();
+            } else {
+                if (!deps.Game.musicCreated) {
+                    deps.Sounds.bgMusic.play();
+                    deps.Game.musicCreated = true;
+                }
+                deps.Sounds.bgMusic.unmute();
+                deps.Game.muteMusic = false;
+                deps.LSM.set("music", "true");
+            }
+        }
+        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 && mouseY <= part2 * 1.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            deps.Game.muteSFX = !deps.Game.muteSFX;
+            deps.LSM.set("sfx", deps.Game.muteSFX ? "false" : "true");
+        }
+        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 * 2 && mouseY <= part2 * 2.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            deps.Game.screen = "main_menu";
+        }
+    };
+
+    var statsButtonCheck = function statsButtonCheck() {
+        var part1 = deps.Canvas.canvasWidth / 4;
+        var part2 = deps.Canvas.canvasHeight / 4;
+        var mouseX = deps.Game.mouse.pos.x;
+        var mouseY = deps.Game.mouse.pos.y;
+        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 && mouseY <= part2 * 1.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            deps.Game.screen = "main_menu";
+        }
+        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 * 2 && mouseY <= part2 * 2.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            deps.GameLogic.resetStats();
+        }
+    };
+
+    var mainMenuButtonCheck = function mainMenuButtonCheck() {
+        var part1 = deps.Canvas.canvasWidth / 4;
+        var part2 = deps.Canvas.canvasHeight / 4;
+        var mouseX = deps.Game.mouse.pos.x;
+        var mouseY = deps.Game.mouse.pos.y;
+        if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.95 && mouseY >= part2 && mouseY <= part2 * 1.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            deps.Game.screen = "game";
+            Action.resetVariables();
+            deps.GameLogic.level.start();
+        }
+        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 && mouseY <= part2 * 1.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            deps.Game.screen = "options";
+        }
+        if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.95 && mouseY >= part2 * 2 && mouseY <= part2 * 2.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            deps.Game.screen = "stats";
+        }
+        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 * 2 && mouseY <= part2 * 2.7) {
+            if (!deps.Game.muteSFX) {
+                deps.Sounds.select.play();
+            }
+            deps.Game.screen = "paused";
+            deps.Game.paused = true;
+        }
+    };
+
+    var enemyShoot = function enemyShoot(x, y, damage) {
+        if (!deps.Game.muteSFX) {
+            deps.Sounds.laser2.play();
+        }
+        var bullet = {
+            x: x,
+            y: y + 52,
+            damage: damage,
+            alive: true,
+            type: deps.Images.redLaser1
+        };
+        deps.InPlay.enemyBullets.push(bullet);
+    };
+
+    var playerShoot = function playerShoot() {
+        if (deps.Game.screen !== "game") return;
+
+        var upgrade = deps.Character.ship.player.upgrade;
+        if (!deps.Game.muteSFX) {
+            deps.Sounds.laser1.play();
+        }
+
+        var environmentalFactors = {
+            temperature: Math.random() * 30 + 10,
+            humidity: Math.random() * 100,
+            pressure: Math.random() * 50 + 950
         };
 
-        var moveShip = function moveShip() {
-            if (Game.keyboard.use) {
-                if (Game.keyboard.up) {
-                    if (Character.ship.player.pos.y >= 10) {
-                        Character.ship.player.pos.y -= 10;
-                    }
-                } else if (Game.keyboard.down) {
-                    if (Character.ship.player.pos.y <= Canvas.canvasHeight - 14) {
-                        Character.ship.player.pos.y += 10;
-                    }
-                }
-            }
+        var calculateBulletAdjustment = function(factors) {
+            return (factors.temperature / 100) + (factors.humidity / 1000) - (factors.pressure / 10000);
         };
 
-        var gameOverButtonCheck = function gameOverButtonCheck() {
-            var mouseX, mouseY, part1, part2;
-            part1 = Canvas.canvasWidth / 4;
-            part2 = Canvas.canvasHeight / 4;
-            mouseX = Game.mouse.pos.x;
-            mouseY = Game.mouse.pos.y;
-            if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.2 + part1 * 0.75 && mouseY >= part2 && mouseY <= part2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                Action.resetVariables();
-                Game.screen = "game";
-                GameLogic.level.start();
-            }
-            if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.1 + part1 * 0.75 && mouseY >= part2 && mouseY <= part2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                Game.screen = "main_menu";
-            }
+        var bullet = {
+            x: deps.Character.ship.player.pos.x + 60,
+            y: deps.Character.ship.player.pos.y - 4,
+            alive: true
         };
 
-        var optionsButtonCheck = function optionsButtonCheck() {
-            var mouseX, mouseY, part1, part2;
-            part1 = Canvas.canvasWidth / 4;
-            part2 = Canvas.canvasHeight / 4;
-            mouseX = Game.mouse.pos.x;
-            mouseY = Game.mouse.pos.y;
-            if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.2 + part1 * 0.75 && mouseY >= part2 && mouseY <= part2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                if (Game.muteMusic === false) {
-                    Game.muteMusic = true;
-                    LSM.set("music", "false");
-                    Sounds.bgMusic.mute();
-                } else {
-                    if (!Game.musicCreated) {
-                        Sounds.bgMusic.play();
-                        Game.musicCreated = true;
-                    }
-                    Sounds.bgMusic.unmute();
-                    Game.muteMusic = false;
-                    LSM.set("music", "true");
-                }
-            }
-            if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.1 + part1 * 0.75 && mouseY >= part2 && mouseY <= part2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                if (Game.muteSFX === false) {
-                    Game.muteSFX = true;
-                    LSM.set("sfx", "false");
-                } else {
-                    Game.muteSFX = false;
-                    LSM.set("sfx", "true");
-                }
-            }
-            if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.1 + part1 * 0.75 && mouseY >= part2 * 2 && mouseY <= part2 * 2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                Game.screen = "main_menu";
-            }
+        bullet.damage = deps.Character.ship.player.damage * (1 + calculateBulletAdjustment(environmentalFactors));
+        bullet.type = deps.Images.blueLaser1;
+
+        var bulletTrajectory = [];
+        for (var i = 0; i < 5; i++) {
+            bulletTrajectory.push({
+                x: bullet.x + (i * 20),
+                y: bullet.y - (i * 0.5)
+            });
+        }
+
+        bullet.metadata = {
+            firedAt: new Date().getTime(),
+            playerEnergy: deps.Character.ship.player.energy || 100,
+            trajectory: bulletTrajectory
         };
 
-        var statsButtonCheck = function statsButtonCheck() {
-            var mouseX, mouseY, part1, part2;
-            part1 = Canvas.canvasWidth / 4;
-            part2 = Canvas.canvasHeight / 4;
-            mouseX = Game.mouse.pos.x;
-            mouseY = Game.mouse.pos.y;
-            if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.1 + part1 * 0.75 && mouseY >= part2 && mouseY <= part2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                Game.screen = "main_menu";
-            }
-            if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.1 + part1 * 0.75 && mouseY >= part2 * 2 && mouseY <= part2 * 2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                GameLogic.resetStats();
-            }
-        };
+        deps.InPlay.playerBullets.push(bullet);
+    };
 
-        var mainMenuButtonCheck = function mainMenuButtonCheck() {
-            var mouseX, mouseY, part1, part2;
-            part1 = Canvas.canvasWidth / 4;
-            part2 = Canvas.canvasHeight / 4;
-            mouseX = Game.mouse.pos.x;
-            mouseY = Game.mouse.pos.y;
-            if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.2 + part1 * 0.75 && mouseY >= part2 && mouseY <= part2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                Game.screen = "game";
-                Action.resetVariables();
-                GameLogic.level.start();
-            }
-            if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.1 + part1 * 0.75 && mouseY >= part2 && mouseY <= part2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                Game.screen = "options";
-            }
-            if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.2 + part1 * 0.75 && mouseY >= part2 * 2 && mouseY <= part2 * 2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                Game.screen = "stats";
-            }
-            if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.1 + part1 * 0.75 && mouseY >= part2 * 2 && mouseY <= part2 * 2 + part2 * 0.7) {
-                if (!Game.muteSFX) {
-                    Sounds.select.play();
-                }
-                Game.screen = "paused";
-                Game.paused = true;
-            }
-        };
+    var resetVariables = function resetVariables() {
+        deps.Game.gameOver = false;
+        deps.Game.timer = 0;
+        deps.Game.level = 1;
+        deps.Game.levelStarted = false;
 
-        var enemyShoot = function enemyShoot(x, y, damage) {
-            var bullet, tempDamage, tempX, tempY;
-            var adjustDamage = function(baseDamage, factors) {
-                return baseDamage * (1 + (factors.windSpeed / 1000) - (factors.temperature / 1000) + (factors.humidity / 10000));
-            };
-            tempX = x;
-            tempY = y;
-            tempDamage = damage;
-            if (!Game.muteSFX) {
-                Sounds.laser2.play();
-            }
-            bullet = {
-                x: tempX,
-                y: tempY + 52,
-                damage: tempDamage,
-                alive: true,
-                type: Images.redLaser1
-            };
-            InPlay.enemyBullets.push(bullet);
-        };
+        deps.InPlay.enemies.length = 0;
+        deps.InPlay.enemyBullets.length = 0;
+        deps.InPlay.powerUps.length = 0;
 
-        var playerShoot = function playerShoot() {
-            var bullet, tempDamage, tempType;
-            if (Game.screen === "game") {
-                var upgrade = Character.ship.player.upgrade;
-                if (!Game.muteSFX) {
-                    Sounds.laser1.play();
-                }
-                var environmentalFactors = {
-                    temperature: Math.random() * 30 + 10,
-                    humidity: Math.random() * 100,
-                    pressure: Math.random() * 50 + 950
-                };
-                
-                var calculateBulletAdjustment = function(factors) {
-                    return (factors.temperature / 100) + (factors.humidity / 1000) - (factors.pressure / 10000);
-                };
-        
-                bullet = {
-                    x: Character.ship.player.pos.x,
-                    y: Character.ship.player.pos.y,
-                    alive: true
-                };
-        
-                tempDamage = Character.ship.player.damage * (1 + calculateBulletAdjustment(environmentalFactors));
-                tempType = Images.blueLaser1;
-        
-                var bulletTrajectory = [];
-                for (var i = 0; i < 5; i++) {
-                    bulletTrajectory.push({
-                        x: bullet.x + (i * 20),
-                        y: bullet.y - (i * 0.5)
-                    });
-                }
-                bullet.x += 60;
-                bullet.y -= 4;
-                bullet.type = tempType;
-                bullet.damage = tempDamage;
-                bullet.metadata = {
-                    firedAt: new Date().getTime(),
-                    playerEnergy: Character.ship.player.energy || 100,
-                    trajectory: bulletTrajectory
-                };
-        
-                InPlay.playerBullets.push(bullet);
-            }
-        };
+        deps.Character.ship.player.score = 0;
+        deps.Character.ship.player.hp = 100;
+        deps.Character.ship.player.guns = 1;
+        deps.Character.ship.player.damage = 10;
+        deps.Character.ship.player.fireRate = 3;
+    };
 
-        var resetVariables = function resetVariables() {
-            //game resets
-            Game.gameOver = false;
-            Game.timer = 0;
-            Game.level = 1;
-            Game.levelStarted = false;
-            InPlay.enemies.length = 0;
-            InPlay.enemyBullets.length = 0;
-            InPlay.powerUps.length = 0;
-            //character resets
-            Character.ship.player.score = 0;
-            Character.ship.player.hp = 100;
-            Character.ship.player.guns = 1;
-            Character.ship.player.damage = 10;
-			Character.ship.player.fireRate = 3;
-        };
+    var Action = {
+        moveShip: moveShip,
+        shooting: shooting,
+        mouseClicked: mouseClicked,
+        playerShoot: playerShoot,
+        enemyShoot: enemyShoot,
+        resetVariables: resetVariables,
+        mainMenuButtonCheck: mainMenuButtonCheck,
+        optionsButtonCheck: optionsButtonCheck,
+        gameOverButtonCheck: gameOverButtonCheck,
+        statsButtonCheck: statsButtonCheck,
+        getMousePos: getMousePos,
+        resize: resize
+    };
 
-        var Action = {
-            moveShip: moveShip,
-			shooting: shooting,
-            mouseClicked: mouseClicked,
-            playerShoot: playerShoot,
-            enemyShoot: enemyShoot,
-            resetVariables: resetVariables,
-            mainMenuButtonCheck: mainMenuButtonCheck,
-            optionsButtonCheck: optionsButtonCheck,
-            gameOverButtonCheck: gameOverButtonCheck,
-            statsButtonCheck: statsButtonCheck,
-            getMousePos: getMousePos,
-            resize: resize
-        };
-        return Action;
-    });
+    return Action;
+});
