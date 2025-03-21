@@ -1,34 +1,27 @@
 define(["model/game"], function (Game) {
     var init = function init() {
         if (typeof (Storage) !== "undefined") {
-            if (localStorage.getItem("music") === null) {
-                localStorage.setItem("music", "true");
-            }
-            if (localStorage.getItem("sfx") === null) {
-                localStorage.setItem("sfx", "true");
-            }
-            if (localStorage.getItem("scout") === null) {
-                localStorage.setItem("scout", "0");
-            }
-            if (localStorage.getItem("fighter") === null) {
-                localStorage.setItem("fighter", "0");
-            }
-            if (localStorage.getItem("interceptor") === null) {
-                localStorage.setItem("interceptor", "0");
-            }
-            if (localStorage.getItem("tank") === null) {
-                localStorage.setItem("tank", "0");
-            }
-            if (localStorage.getItem("transport") === null) {
-                localStorage.setItem("transport", "0");
-            }
-            if (localStorage.getItem("highscore") === null) {
-                localStorage.setItem("highscore", "0");
-            }
+            const defaultValues = {
+                "music": "true",
+                "sfx": "true",
+                "scout": "0",
+                "fighter": "0",
+                "interceptor": "0",
+                "tank": "0",
+                "transport": "0",
+                "highscore": "0"
+            };
+    
+            Object.keys(defaultValues).forEach(function(key) {
+                if (localStorage.getItem(key) === null) {
+                    localStorage.setItem(key, defaultValues[key]);
+                }
+            });
         } else {
-            console.log("nolocalstorage sup"); //TODO
+            console.log("nolocalstorage sup"); // TODO
         }
     };
+    
 
     var load = function load() {
         if (localStorage.getItem("music") === "true") {
