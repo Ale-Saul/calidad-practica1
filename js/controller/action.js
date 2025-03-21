@@ -22,46 +22,48 @@ define(["model/dependencies"], function(deps) {
         context.canvas.height = window.innerHeight - 70;
     };
 
-    const mouseClicked = function mouseClicked(down, kb) {
-        deps.Game.keyboard.use = false;
-        deps.Game.mouse.use = true;
-        switch (deps.Game.screen) {
-            case "main_menu":
-                if (down && !kb) {
-                    Action.mainMenuButtonCheck();
+    const handleSimpleClick = function(down, kb, callback) {
+        if (down && !kb) {
+            callback();
+        }
+    };
+    
+    const handleGameClick = function(down) {
+        if (down && !deps.Game.keyboard.sbFlag) {
+            deps.Game.keyboard.sbFlag = true;
+            Action.shooting = setInterval(function () {
+                if (deps.Character.ship.player.hp > 0) {
+                    Action.playerShoot();
                 }
-                break;
-            case "game":
-                if (down && !deps.Game.keyboard.sbFlag) {
-                    deps.Game.keyboard.sbFlag = true;
-                    Action.shooting = setInterval(function () {
-                        if (deps.Character.ship.player.hp > 0) {
-                            Action.playerShoot();
-                        }
-                    }, 100);
-                } else if (!down) {
-                    clearInterval(Action.shooting);
-                    deps.Game.keyboard.sbFlag = false;
-                }
-                break;
-            case "game_over":
-                if (down && !kb) {
-                    Action.gameOverButtonCheck();
-                }
-                break;
-            case "options":
-                if (down && !kb) {
-                    Action.optionsButtonCheck();
-                }
-                break;
-            case "stats":
-                if (down && !kb) {
-                    Action.statsButtonCheck();
-                }
-                break;
+            }, 100);
+        } else if (!down) {
+            clearInterval(Action.shooting);
+            deps.Game.keyboard.sbFlag = false;
         }
     };
 
+    const mouseClicked = function mouseClicked(down, kb) {
+    deps.Game.keyboard.use = false;
+    deps.Game.mouse.use = true;
+
+    switch (deps.Game.screen) {
+        case "main_menu":
+            handleSimpleClick(down, kb, Action.mainMenuButtonCheck);
+            break;
+        case "game":
+            handleGameClick(down);
+            break;
+        case "game_over":
+            handleSimpleClick(down, kb, Action.gameOverButtonCheck);
+            break;
+        case "options":
+            handleSimpleClick(down, kb, Action.optionsButtonCheck);
+            break;
+        case "stats":
+            handleSimpleClick(down, kb, Action.statsButtonCheck);
+            break;
+    }
+};
     const moveShip = function moveShip() {
         if (deps.Game.keyboard.use) {
             if (deps.Game.keyboard.up && deps.Character.ship.player.pos.y >= 10) {
