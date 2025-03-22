@@ -115,56 +115,37 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
         };
 
         var drawPlayerShip = function drawPlayerShip() {
-            var sprite, sx, sy, width, height, x, y, frame;
-			frame = Character.ship.player.frame;
-            x = Character.ship.player.pos.x;
-            y = Character.ship.player.pos.y;
-            sprite = Character.ship.player.sprite;
-            width = Character.ship.player.width;
-            height = Character.ship.player.height;
-            sy = 0;
-            if (Character.ship.player.hp > 0) {
+            const player = Character.ship.player;
+            let sprite = player.sprite;
+            let sx = 0, sy = 0, width = player.width, height = player.height;
+            let x = player.pos.x, y = player.pos.y, frame = player.frame;
+        
+            const getFrameSX = (frame, isExplosion) => {
+                if (isExplosion) {
+                    const explosionFrames = [0, 192, 384, 576, 768, 960, 0, 192];
+                    const explosionFrameIndex = Math.floor(frame);
+                    sy = (explosionFrameIndex >= 6) ? 192 : 0;
+                    return explosionFrames[explosionFrameIndex];
+                } else {
+                    return frame * 75;
+                }
+            };
+        
+            if (player.hp > 0) {
+                // Player is alive: Draw player ship and gun
                 Canvas.context.drawImage(Images.gun0, x + 55, y - 8.5);
-                if (frame === 0) {
-                    sx = 0;
-                } else if (frame === 1) {
-                    sx = 75;
-                } else if (frame === 2) {
-                    sx = 150;
-                } else if (frame === 3) {
-                    sx = 225;
-                }
-                Character.ship.player.frame += 1;
-                if (Character.ship.player.frame >= 4) {
-                    Character.ship.player.frame = 0;
-                }
+                sx = getFrameSX(frame, false);
+                player.frame = (frame + 1) % 4;
             } else {
-				width = 192;
-				height = 192;
-				sprite = Images.explosion;
-				if (frame === 0) {
-                    sx = 0;
-                } else if (frame <= 1) {
-                    sx = 192;
-                } else if (frame <= 2) {
-                    sx = 384;
-                } else if (frame <= 3) {
-                    sx = 576;
-                } else if (frame <= 4) {
-                    sx = 768;
-                } else if (frame <= 5) {
-                    sx = 960;
-                } else if (frame <= 6) {
-                    sx = 0;
-					sy = 192;
-                } else if (frame <= 7) {
-                    sx = 192;
-					sy = 192;
-                }
-                Character.ship.player.frame += 0.2;
-			}
-			Canvas.context.drawImage(sprite, sx, sy, width, height, x, y - (height / 2), width, height);
+                // Player is dead: Draw explosion animation
+                sprite = Images.explosion;
+                sx = getFrameSX(frame, true);
+                player.frame += 0.2;
+            }
+        
+            Canvas.context.drawImage(sprite, sx, sy, width, height, x, y - height / 2, width, height);
         };
+        
 
         var drawPowerups = function drawPowerups() {
             var i;
