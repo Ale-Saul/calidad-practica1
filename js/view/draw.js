@@ -16,9 +16,7 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
         };
 
         var drawBackground = function drawBackground() {
-            var mousex, mousey;
-            mousex = Game.mouse.pos.x;
-            mousey = Game.mouse.pos.Y;
+            
             //Black space
             Canvas.context.fillStyle = "#000000";
             Canvas.context.fillRect(0, 0, Canvas.canvas.width, Canvas.canvas.height);
