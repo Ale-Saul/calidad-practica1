@@ -94,44 +94,60 @@ define(["model/dependencies"], function(deps) {
             deps.Game.screen = "main_menu";
         }
     };
+    
+    const toggleMusic = function() {
+        if (!deps.Game.muteSFX) deps.Sounds.select.play();
+    
+        if (deps.Game.muteMusic === false) {
+            deps.Game.muteMusic = true;
+            deps.LSM.set("music", "false");
+            deps.Sounds.bgMusic.mute();
+        } else {
+            if (!deps.Game.musicCreated) {
+                deps.Sounds.bgMusic.play();
+                deps.Game.musicCreated = true;
+            }
+            deps.Sounds.bgMusic.unmute();
+            deps.Game.muteMusic = false;
+            deps.LSM.set("music", "true");
+        }
+    };
+    
+    const toggleSFX = function() {
+        if (!deps.Game.muteSFX) deps.Sounds.select.play();
+    
+        deps.Game.muteSFX = !deps.Game.muteSFX;
+        deps.LSM.set("sfx", deps.Game.muteSFX ? "false" : "true");
+    };
+    
+    const returnToMainMenu = function() {
+        if (!deps.Game.muteSFX) deps.Sounds.select.play();
+        deps.Game.screen = "main_menu";
+    };
 
+    const isInside = function(mouseX, mouseY, x1, x2, y1, y2) {
+        return mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
+    };
+    
     const optionsButtonCheck = function optionsButtonCheck() {
         const part1 = deps.Canvas.canvasWidth / 4;
         const part2 = deps.Canvas.canvasHeight / 4;
         const mouseX = deps.Game.mouse.pos.x;
         const mouseY = deps.Game.mouse.pos.y;
-        if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.95 && mouseY >= part2 && mouseY <= part2 * 1.7) {
-            if (!deps.Game.muteSFX) {
-                deps.Sounds.select.play();
-            }
-            if (deps.Game.muteMusic === false) {
-                deps.Game.muteMusic = true;
-                deps.LSM.set("music", "false");
-                deps.Sounds.bgMusic.mute();
-            } else {
-                if (!deps.Game.musicCreated) {
-                    deps.Sounds.bgMusic.play();
-                    deps.Game.musicCreated = true;
-                }
-                deps.Sounds.bgMusic.unmute();
-                deps.Game.muteMusic = false;
-                deps.LSM.set("music", "true");
-            }
+    
+        if (isInside(mouseX, mouseY, part1 * 1.2, part1 * 1.95, part2, part2 * 1.7)) {
+            toggleMusic();
         }
-        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 && mouseY <= part2 * 1.7) {
-            if (!deps.Game.muteSFX) {
-                deps.Sounds.select.play();
-            }
-            deps.Game.muteSFX = !deps.Game.muteSFX;
-            deps.LSM.set("sfx", deps.Game.muteSFX ? "false" : "true");
+    
+        if (isInside(mouseX, mouseY, part1 * 2.1, part1 * 2.85, part2, part2 * 1.7)) {
+            toggleSFX();
         }
-        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 * 2 && mouseY <= part2 * 2.7) {
-            if (!deps.Game.muteSFX) {
-                deps.Sounds.select.play();
-            }
-            deps.Game.screen = "main_menu";
+    
+        if (isInside(mouseX, mouseY, part1 * 2.1, part1 * 2.85, part2 * 2, part2 * 2.7)) {
+            returnToMainMenu();
         }
     };
+    
 
     const statsButtonCheck = function statsButtonCheck() {
         const part1 = deps.Canvas.canvasWidth / 4;
