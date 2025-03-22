@@ -1,5 +1,5 @@
 define([], function () {
-    var InPlay = {
+    const InPlay = {
         enemies: enemies = [],
         playerBullets: playerBullets = [],
         enemyBullets: enemyBullets = [],
