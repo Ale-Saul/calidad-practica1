@@ -168,39 +168,42 @@ define(["model/dependencies"], function(deps) {
         }
     };
 
-    const mainMenuButtonCheck = function mainMenuButtonCheck() {
-        const part1 = deps.Canvas.canvasWidth / 4;
-        const part2 = deps.Canvas.canvasHeight / 4;
-        const mouseX = deps.Game.mouse.pos.x;
-        const mouseY = deps.Game.mouse.pos.y;
-        if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.95 && mouseY >= part2 && mouseY <= part2 * 1.7) {
-            if (!deps.Game.muteSFX) {
-                deps.Sounds.select.play();
-            }
-            deps.Game.screen = "game";
-            Action.resetVariables();
-            deps.GameLogic.level.start();
-        }
-        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 && mouseY <= part2 * 1.7) {
-            if (!deps.Game.muteSFX) {
-                deps.Sounds.select.play();
-            }
-            deps.Game.screen = "options";
-        }
-        if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.95 && mouseY >= part2 * 2 && mouseY <= part2 * 2.7) {
-            if (!deps.Game.muteSFX) {
-                deps.Sounds.select.play();
-            }
-            deps.Game.screen = "stats";
-        }
-        if (mouseX >= part1 * 2.1 && mouseX <= part1 * 2.85 && mouseY >= part2 * 2 && mouseY <= part2 * 2.7) {
-            if (!deps.Game.muteSFX) {
-                deps.Sounds.select.play();
-            }
-            deps.Game.screen = "paused";
-            deps.Game.paused = true;
+    const playSelectSound = function() {
+        if (!deps.Game.muteSFX) {
+            deps.Sounds.select.play();
         }
     };
+    
+
+    const mainMenuButtonCheck = function mainMenuButtonCheck() {
+    const part1 = deps.Canvas.canvasWidth / 4;
+    const part2 = deps.Canvas.canvasHeight / 4;
+    const mouseX = deps.Game.mouse.pos.x;
+    const mouseY = deps.Game.mouse.pos.y;
+
+    if (isInside(mouseX, mouseY, part1 * 1.2, part1 * 1.95, part2, part2 * 1.7)) {
+        playSelectSound();
+        deps.Game.screen = "game";
+        Action.resetVariables();
+        deps.GameLogic.level.start();
+    }
+
+    if (isInside(mouseX, mouseY, part1 * 2.1, part1 * 2.85, part2, part2 * 1.7)) {
+        playSelectSound();
+        deps.Game.screen = "options";
+    }
+
+    if (isInside(mouseX, mouseY, part1 * 1.2, part1 * 1.95, part2 * 2, part2 * 2.7)) {
+        playSelectSound();
+        deps.Game.screen = "stats";
+    }
+
+    if (isInside(mouseX, mouseY, part1 * 2.1, part1 * 2.85, part2 * 2, part2 * 2.7)) {
+        playSelectSound();
+        deps.Game.screen = "paused";
+        deps.Game.paused = true;
+    }
+};
 
     const enemyShoot = function enemyShoot(x, y, damage) {
         if (!deps.Game.muteSFX) {
