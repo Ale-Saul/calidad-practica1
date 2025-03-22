@@ -1,6 +1,6 @@
 define(["model/canvas"], function (Canvas) {
-    var generateStar = function generateStar(old) {
-        var star = {
+    const generateStar = function generateStar(old) {
+        const star = {
             y: Math.floor(Math.random() * Canvas.canvasHeight) + 1,
             speed: Math.floor(Math.random() * 4) + 1
         };
@@ -12,16 +12,15 @@ define(["model/canvas"], function (Canvas) {
         return star;
     };
 
-    var addStars = function addStars() {
+    const addStars = function addStars() {
         "use strict";
-        var i;
-        for (i = 0; i < Game.noStars; i += 1) {
+        for (let i = 0; i < Game.noStars; i += 1) {
             Game.stars.push(generateStar());
         }
     };
 
-    var getScreen = function getScreen() {
-        var screen, curPage;
+    const getScreen = function getScreen() {
+        let screen, curPage;
         curPage = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
         if (curPage === "" || curPage === "index.html") {
             Game.screen = "main_menu";
@@ -31,35 +30,37 @@ define(["model/canvas"], function (Canvas) {
         return screen;
     };
 
-    var keyboard = {
+    const keyboard = {
         use: false,
         sbFlag: false,
         up: false,
         down: false
     };
-    var mouse = {
+
+    const mouse = {
         use: false,
         mdFlag: false,
-        pos: pos = {
+        pos: {
             x: 100,
             y: 100
         }
     };
-    var Game = {
+
+    const Game = {
         //functions
-        generateStar: generateStar,
-        addStars: addStars,
-        getScreen: getScreen,
+        generateStar,
+        addStars,
+        getScreen,
         //variables
-        stars: stars = [],
+        stars: [],
         noStars: 300,
         screen: "",
         timer: 0,
         level: 1,
         gameOver: false,
         levelStarted: false,
-        keyboard: keyboard,
-        mouse: mouse,
+        keyboard,
+        mouse,
         fps: 0,
         lastCalledTime: 0,
         lastScreen: "main_menu",
