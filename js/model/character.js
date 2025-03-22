@@ -1,5 +1,5 @@
 define(["model/images"], function (Images) {
-    var player = {
+    const player = {
         name: "player1",
         sprite: Images.playerShip,
         width: 75,
@@ -9,16 +9,17 @@ define(["model/images"], function (Images) {
         damage: 10,
         guns: 1,
         fireRate: 3,
-		hasShot: false,
+        hasShot: false,
         hp: 100,
         lives: 3,
-        pos: pos = {
+        pos: {
             x: 40,
             y: 100
         }
     };
-    var enemy = {
-        scout: scout = {
+
+    const enemy = {
+        scout: {
             name: "scout",
             ship: Images.scout,
             width: 84,
@@ -34,7 +35,7 @@ define(["model/images"], function (Images) {
             time: 0,
             speed: 7
         },
-        fighter: fighter = {
+        fighter: {
             name: "fighter",
             ship: Images.fighter,
             width: 84,
@@ -50,7 +51,7 @@ define(["model/images"], function (Images) {
             time: 0,
             speed: 3
         },
-        interceptor: interceptor = {
+        interceptor: {
             name: "interceptor",
             ship: Images.interceptor,
             width: 84,
@@ -66,7 +67,7 @@ define(["model/images"], function (Images) {
             time: 0,
             speed: 2.5
         },
-        tank: tank = {
+        tank: {
             name: "tank",
             ship: Images.tank,
             width: 84,
@@ -82,7 +83,7 @@ define(["model/images"], function (Images) {
             time: 0,
             speed: 2
         },
-        transport: transport = {
+        transport: {
             name: "transport",
             ship: Images.transport,
             width: 84,
@@ -98,14 +99,16 @@ define(["model/images"], function (Images) {
             time: 0,
             speed: 3
         }
+    };
 
+    const ship = {
+        enemy,
+        player
     };
-    var ship = {
-        enemy: enemy,
-        player: player
+
+    const Character = {
+        ship
     };
-    var Character = {
-        ship: ship
-    };
+
     return Character;
 });
