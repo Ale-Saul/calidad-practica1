@@ -132,12 +132,10 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             };
         
             if (player.hp > 0) {
-                // Player is alive: Draw player ship and gun
                 Canvas.context.drawImage(Images.gun0, x + 55, y - 8.5);
                 sx = getFrameSX(frame, false);
                 player.frame = (frame + 1) % 4;
             } else {
-                // Player is dead: Draw explosion animation
                 sprite = Images.explosion;
                 sx = getFrameSX(frame, true);
                 player.frame += 0.2;
