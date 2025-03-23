@@ -221,8 +221,6 @@ define(["model/dependencies"], function(deps) {
 
     const playerShoot = function playerShoot() {
         if (deps.Game.screen !== "game") return;
-
-        const upgrade = deps.Character.ship.player.upgrade;
         if (!deps.Game.muteSFX) {
             deps.Sounds.laser1.play();
         }
