@@ -347,6 +347,5 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             drawPause: drawPause,
             drawGameOver: drawGameOver
         };
-
         return Draw;
     });
