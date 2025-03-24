@@ -1,12 +1,12 @@
 define(["view/draw", "model/game", "controller/gameLogic", "controller/action", "model/canvas", "model/sounds"], function (Draw, Game, GameLogic, Action, Canvas, Sounds) {
-    var gameLoop = function gameLoop() {
+    const gameLoop = function gameLoop() {
         if (window.requestAnimationFrame === undefined) {
-			Canvas.context.fillStyle = "#FFFFFF";
+            Canvas.context.fillStyle = "#FFFFFF";
             Canvas.context.fillRect(0, 0, Canvas.canvas.width, Canvas.canvas.height);
-			Canvas.context.fillStyle = "#000000";
+            Canvas.context.fillStyle = "#000000";
             Canvas.context.font = "20px Verdana";
-            Canvas.context.fillText("Your browser does not support requestAnimationFrame", 100, Canvas.canvasHeight*0.25);
-            Canvas.context.fillText("Please upgrade your browser", 100, Canvas.canvasHeight*0.75);
+            Canvas.context.fillText("Your browser does not support requestAnimationFrame", 100, Canvas.canvasHeight * 0.25);
+            Canvas.context.fillText("Please upgrade your browser", 100, Canvas.canvasHeight * 0.75);
         } else {
             requestAnimationFrame(GameRunner.gameLoop);
             GameRunner.changeTextSize();
@@ -15,7 +15,7 @@ define(["view/draw", "model/game", "controller/gameLogic", "controller/action", 
         }
     };
 
-    var pauseGame = function pauseGame() {
+    const pauseGame = function pauseGame() {
         if (Game.levelStarted || Game.screen === "paused") {
             if (!Game.muteSFX) {
                 Sounds.pause.play();
@@ -38,9 +38,9 @@ define(["view/draw", "model/game", "controller/gameLogic", "controller/action", 
         }
     };
 
-    var changeTextSize = function changeTextSize() {
-        var width = Canvas.canvasWidth;
-        var height = Canvas.canvasHeight;
+    const changeTextSize = function changeTextSize() {
+        const width = Canvas.canvasWidth;
+        const height = Canvas.canvasHeight;
         if (width < 835 || height < 444) {
             if (!Game.paused) {
                 GameRunner.pauseGame();
@@ -60,18 +60,18 @@ define(["view/draw", "model/game", "controller/gameLogic", "controller/action", 
         }
     };
 
-    var draw = function draw() {
+    const draw = function draw() {
         Draw.drawBackground();
-        //Checks which screen user is on
+        // Checks which screen user is on
         if (Game.screen === "game") {
             Draw.drawGame();
             GameLogic.checkCollisions();
-		} else {
+        } else {
             Draw.drawMenu();
         }
     };
 
-    var GameRunner = {
+    const GameRunner = {
         pauseGame: pauseGame,
         changeTextSize: changeTextSize,
         gameLoop: gameLoop,

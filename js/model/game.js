@@ -1,6 +1,6 @@
 define(["model/canvas"], function (Canvas) {
-    var generateStar = function generateStar(old) {
-        var star = {
+    const generateStar = function generateStar(old) {
+        const star = {
             y: Math.floor(Math.random() * Canvas.canvasHeight) + 1,
             speed: Math.floor(Math.random() * 4) + 1
         };
@@ -12,15 +12,16 @@ define(["model/canvas"], function (Canvas) {
         return star;
     };
 
-    var addStars = function addStars() {
+    const addStars = function addStars() {
         "use strict";
         for (let i = 0; i < Game.noStars; i += 1) {
             Game.stars.push(generateStar());
         }
     };
 
-    var getScreen = function getScreen() {
-        var curPage = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
+    const getScreen = function getScreen() {
+        let screen, curPage;
+        curPage = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
         if (curPage === "" || curPage === "index.html") {
             Game.screen = "main_menu";
         } else if (curPage === "about.html") {
@@ -29,14 +30,14 @@ define(["model/canvas"], function (Canvas) {
         return Game.screen;
     };
 
-    var keyboard = {
+    const keyboard = {
         use: false,
         sbFlag: false,
         up: false,
         down: false
     };
 
-    var mouse = {
+    const mouse = {
         use: false,
         mdFlag: false,
         pos: {
@@ -45,12 +46,12 @@ define(["model/canvas"], function (Canvas) {
         }
     };
 
-    var Game = {
-        // functions
-        generateStar: generateStar,
-        addStars: addStars,
-        getScreen: getScreen,
-        // variables
+    const Game = {
+        //functions
+        generateStar,
+        addStars,
+        getScreen,
+        //variables
         stars: [],
         noStars: 300,
         screen: "",
@@ -58,8 +59,8 @@ define(["model/canvas"], function (Canvas) {
         level: 1,
         gameOver: false,
         levelStarted: false,
-        keyboard: keyboard,
-        mouse: mouse,
+        keyboard,
+        mouse,
         fps: 0,
         lastCalledTime: 0,
         lastScreen: "main_menu",

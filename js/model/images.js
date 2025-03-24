@@ -1,7 +1,6 @@
 define([""], function () {
-    var Images = {};
-    var sources, src;
-    sources = {
+    const Images = {};
+    const sources = {
         //menu
         bigLogo: "images/logo/logo_large.png",
         blueMetal: "images/menu/backdrop/blueMetalSheet.jpg",
@@ -44,10 +43,11 @@ define([""], function () {
         pickUpHealth: "images/misc/pickup/pickup_health.png",
         pickUpDamage: "images/misc/pickup/pickup_damage.png",
         pickUpFireRate: "images/misc/pickup/pickup_firerate.png",
-		//misc
-		explosion: "images/misc/explosion/explosion.png"
+        //misc
+        explosion: "images/misc/explosion/explosion.png"
     };
-    for (src in sources) {
+
+    for (const src in sources) {
         Images[src] = new Image();
         Images[src].src = sources[src];
     }

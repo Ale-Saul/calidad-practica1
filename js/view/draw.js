@@ -1,8 +1,8 @@
 define(["model/images", "model/canvas", "model/game", "model/character", "controller/gameLogic", "model/inPlay", "controller/action"],
     function (Images, Canvas, Game, Character, GameLogic, InPlay, Action) {
-        var drawStars = function drawStars() {
-            var i, size, x, y;
-            for (i = 0; i < Game.stars.length; i += 1) {
+        const drawStars = function drawStars() {
+            let size, x, y;
+            for (let i = 0; i < Game.stars.length; i += 1) {
                 if (Game.stars[i].x < 0) {
                     Game.stars[i] = Game.generateStar(true);
                 }
@@ -15,16 +15,17 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             }
         };
 
-        var drawBackground = function drawBackground() {
-            
+        const drawBackground = function drawBackground() {
+            let mousex = Game.mouse.pos.x;
+            let mousey = Game.mouse.pos.Y;
             //Black space
             Canvas.context.fillStyle = "#000000";
             Canvas.context.fillRect(0, 0, Canvas.canvas.width, Canvas.canvas.height);
             //Debris/Stars
             drawStars();
         };
-        var drawMainMenu = function drawMainMenu() {
-            var part1, part2, start, options, stats, help, mouseX, mouseY;
+        const drawMainMenu = function drawMainMenu() {
+            let part1, part2, start, options, stats, help, mouseX, mouseY;
             part1 = Canvas.canvasWidth / 4;
             part2 = Canvas.canvasHeight / 4;
             mouseX = Game.mouse.pos.x;
@@ -59,12 +60,12 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             Canvas.context.drawImage(help, part1 * 2.1, part2 * 2, part1 * 0.75, part2 * 0.7);
         };
 
-        var drawOptions = function drawOptions() {
-            var part1, part2, muteMusic, muteSFX, mainMenu;
+        const drawOptions = function drawOptions() {
+            let part1, part2, muteMusic, muteSFX, mainMenu;
             part1 = Canvas.canvasWidth / 4;
             part2 = Canvas.canvasHeight / 4;
-            var mouseX = Game.mouse.pos.x;
-            var mouseY = Game.mouse.pos.y;
+            let mouseX = Game.mouse.pos.x;
+            let mouseY = Game.mouse.pos.y;
             //Button animation
             if (Game.muteMusic) {
                 muteMusic = Images.muteMusic1;
@@ -90,7 +91,7 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             Canvas.context.drawImage(mainMenu, part1 * 2.1, part2 * 2, part1 * 0.75, part2 * 0.7);
         };
 
-        var drawMenu = function drawMenu() {
+        const drawMenu = function drawMenu() {
             switch (Game.screen) {
             case "main_menu":
                 Draw.drawMainMenu();
@@ -112,62 +113,40 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             }
         };
 
-        var drawPlayerShip = function drawPlayerShip() {
-            var sprite, sx, sy, width, height, x, y, frame;
-			frame = Character.ship.player.frame;
-            x = Character.ship.player.pos.x;
-            y = Character.ship.player.pos.y;
-            sprite = Character.ship.player.sprite;
-            width = Character.ship.player.width;
-            height = Character.ship.player.height;
-            sy = 0;
-            if (Character.ship.player.hp > 0) {
+        const drawPlayerShip = function drawPlayerShip() {
+            const player = Character.ship.player;
+            let sprite = player.sprite;
+            let sx = 0, sy = 0, width = player.width, height = player.height;
+            let x = player.pos.x, y = player.pos.y, frame = player.frame;
+        
+            const getFrameSX = (frame, isExplosion) => {
+                if (isExplosion) {
+                    const explosionFrames = [0, 192, 384, 576, 768, 960, 0, 192];
+                    const explosionFrameIndex = Math.floor(frame);
+                    sy = (explosionFrameIndex >= 6) ? 192 : 0;
+                    return explosionFrames[explosionFrameIndex];
+                } else {
+                    return frame * 75;
+                }
+            };
+        
+            if (player.hp > 0) {
                 Canvas.context.drawImage(Images.gun0, x + 55, y - 8.5);
-                if (frame === 0) {
-                    sx = 0;
-                } else if (frame === 1) {
-                    sx = 75;
-                } else if (frame === 2) {
-                    sx = 150;
-                } else if (frame === 3) {
-                    sx = 225;
-                }
-                Character.ship.player.frame += 1;
-                if (Character.ship.player.frame >= 4) {
-                    Character.ship.player.frame = 0;
-                }
+                sx = getFrameSX(frame, false);
+                player.frame = (frame + 1) % 4;
             } else {
-				width = 192;
-				height = 192;
-				sprite = Images.explosion;
-				if (frame === 0) {
-                    sx = 0;
-                } else if (frame <= 1) {
-                    sx = 192;
-                } else if (frame <= 2) {
-                    sx = 384;
-                } else if (frame <= 3) {
-                    sx = 576;
-                } else if (frame <= 4) {
-                    sx = 768;
-                } else if (frame <= 5) {
-                    sx = 960;
-                } else if (frame <= 6) {
-                    sx = 0;
-					sy = 192;
-                } else if (frame <= 7) {
-                    sx = 192;
-					sy = 192;
-                }
-                Character.ship.player.frame += 0.2;
-			}
-			Canvas.context.drawImage(sprite, sx, sy, width, height, x, y - (height / 2), width, height);
+                sprite = Images.explosion;
+                sx = getFrameSX(frame, true);
+                player.frame += 0.2;
+            }
+        
+            Canvas.context.drawImage(sprite, sx, sy, width, height, x, y - height / 2, width, height);
         };
+        
 
-        var drawPowerups = function drawPowerups() {
-            var i;
-            var powerUps = InPlay.powerUps;
-            for (i = 0; i < powerUps.length; i += 1) {
+        const drawPowerups = function drawPowerups() {
+            let powerUps = InPlay.powerUps;
+            for (let i = 0; i < powerUps.length; i += 1) {
                 if (powerUps[i].alive) {
                     Canvas.context.drawImage(powerUps[i].icon, powerUps[i].x, powerUps[i].y);
                     if (powerUps[i].x <= -10) {
@@ -179,10 +158,10 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             }
         };
 
-        var drawEnemies = function drawEnemies() {
-            var i, relativeTime;
-            var enemies = InPlay.enemies;
-            var environmentalFactors = {
+        const drawEnemies = function drawEnemies() {
+            let relativeTime;
+            let enemies = InPlay.enemies;
+            let environmentalFactors = {
                 windSpeed: Math.random() * 5,
                 visibility: Math.random() * 0.5 + 0.5
             };
@@ -192,7 +171,7 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
                 return Math.sin(behaviorScore) * 10;
             }
         
-            for (i = 0; i < enemies.length; i += 1) {
+            for (let i = 0; i < enemies.length; i += 1) {
                 if (enemies[i].alive) {
                     relativeTime = Game.timer - GameLogic.level.startTime;
                     if (relativeTime > enemies[i].time) {
@@ -234,11 +213,10 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             }
             
         };
-        var drawBullets = function drawBullets() {
-            var i;
-            var playerBullets = InPlay.playerBullets;
-            var enemyBullets = InPlay.enemyBullets;
-            for (i = 0; i < playerBullets.length; i += 1) {
+        const drawBullets = function drawBullets() {
+            let playerBullets = InPlay.playerBullets;
+            let enemyBullets = InPlay.enemyBullets;
+            for (let i = 0; i < playerBullets.length; i += 1) {
                 if (playerBullets[i].alive) {
                     Canvas.context.drawImage(playerBullets[i].type, playerBullets[i].x, playerBullets[i].y);
                     if (playerBullets[i].x >= Canvas.canvasWidth) {
@@ -260,24 +238,24 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             }
         };
 
-        var drawScore = function drawScore() {
-            var score = Character.ship.player.score;
+        const drawScore = function drawScore() {
+            let score = Character.ship.player.score;
             Canvas.context.fillStyle = ("yellow");
             Canvas.context.fillText("Score: " + score, Canvas.canvasWidth * 0.6, 40);
         };
 
-        var drawHP = function drawHP() {
-            var hp = Character.ship.player.hp;
+        const drawHP = function drawHP() {
+            let hp = Character.ship.player.hp;
             Canvas.context.fillStyle = ("yellow");
             Canvas.context.fillText("Health: " + hp, 0, 40);
         };
 
-        var drawGameOver = function drawGameOver() {
+        const drawGameOver = function drawGameOver() {
             var restart, mainMenu;
-            var part1 = Canvas.canvasWidth / 4;
-            var part2 = Canvas.canvasHeight / 4;
-            var mouseX = Game.mouse.pos.x;
-            var mouseY = Game.mouse.pos.y;
+            let part1 = Canvas.canvasWidth / 4;
+            let part2 = Canvas.canvasHeight / 4;
+            let mouseX = Game.mouse.pos.x;
+            let mouseY = Game.mouse.pos.y;
             if (mouseX >= part1 * 1.2 && mouseX <= part1 * 1.2 + part1 * 0.75 && mouseY >= part2 && mouseY <= part2 + part2 * 0.7) {
                 restart = Images.restart1;
             } else {
@@ -301,7 +279,7 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             Canvas.context.fillText("Game Over  Level: " + Game.level + "  Score: " + Character.ship.player.score, (Canvas.canvasWidth / 2) - 345, Canvas.canvasHeight / 1.5);
         };
 
-        var drawStats = function drawStats() {
+        const drawStats = function drawStats() {
             var part1, part2, mainMenu, resetStats, mouseX, mouseY;
             part1 = Canvas.canvasWidth / 4;
             part2 = Canvas.canvasHeight / 4;
@@ -332,11 +310,11 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             Canvas.context.fillText("Transporter: " + Game.transport, part1 * 1.1, part2 * 2.60);
         };
 
-        var drawPause = function drawPause() {
+        const drawPause = function drawPause() {
             Canvas.context.drawImage(Images.pauseScreen, 0, 0, Canvas.canvasWidth, Canvas.canvasHeight);
         };
 
-        var drawGame = function drawGame() {
+        const drawGame = function drawGame() {
             if (Game.levelStarted) {
                 Draw.drawScore();
                 Draw.drawHP();
@@ -350,7 +328,7 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             Draw.drawPowerups();
         };
 
-        var Draw = {
+        const Draw = {
             //functions
 
             drawStars: drawStars,
