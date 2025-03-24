@@ -10,10 +10,8 @@ define(["model/images"], function (Images) {
         guns: 1,
         fireRate: 3,
         hasShot: false,
-        hasShot: false,
         hp: 100,
         lives: 3,
-        pos: {
         pos: {
             x: 40,
             y: 100
@@ -38,7 +36,6 @@ define(["model/images"], function (Images) {
             speed: 7
         },
         fighter: {
-        fighter: {
             name: "fighter",
             ship: Images.fighter,
             width: 84,
@@ -54,7 +51,6 @@ define(["model/images"], function (Images) {
             time: 0,
             speed: 3
         },
-        interceptor: {
         interceptor: {
             name: "interceptor",
             ship: Images.interceptor,
@@ -72,7 +68,6 @@ define(["model/images"], function (Images) {
             speed: 2.5
         },
         tank: {
-        tank: {
             name: "tank",
             ship: Images.tank,
             width: 84,
@@ -88,7 +83,6 @@ define(["model/images"], function (Images) {
             time: 0,
             speed: 2
         },
-        transport: {
         transport: {
             name: "transport",
             ship: Images.transport,
@@ -115,7 +109,6 @@ define(["model/images"], function (Images) {
     var Character = {
         ship: ship
     };
-
 
     return Character;
 });
