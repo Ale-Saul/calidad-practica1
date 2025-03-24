@@ -1,5 +1,5 @@
 define(["model/game"], function (Game) {
-    var init = function init() {
+    const init = function init() {
         if (typeof (Storage) !== "undefined") {
             const defaultValues = {
                 "music": "true",
