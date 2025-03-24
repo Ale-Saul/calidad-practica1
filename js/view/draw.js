@@ -227,12 +227,12 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
                 }
             }
             for (let j = 0; j < enemyBullets.length; j += 1) {
-                if (enemyBullets[i].alive) {
+                if (enemyBullets[j].alive) {
                     Canvas.context.drawImage(enemyBullets[i].type, enemyBullets[i].x, enemyBullets[i].y);
-                    if (enemyBullets[i].x <= 0) {
+                    if (enemyBullets[j].x <= 0) {
                         enemyBullets.shift();
                     } else {
-                        enemyBullets[i].x -= 10;
+                        enemyBullets[j].x -= 10;
                     }
                 }
             }
