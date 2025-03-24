@@ -14,21 +14,19 @@ define(["model/canvas"], function (Canvas) {
 
     var addStars = function addStars() {
         "use strict";
-        var i;
-        for (i = 0; i < Game.noStars; i += 1) {
+        for (let i = 0; i < Game.noStars; i += 1) {
             Game.stars.push(generateStar());
         }
     };
 
     var getScreen = function getScreen() {
-        var screen, curPage;
-        curPage = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
+        var curPage = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
         if (curPage === "" || curPage === "index.html") {
             Game.screen = "main_menu";
         } else if (curPage === "about.html") {
             Game.screen = "about";
         }
-        return screen;
+        return Game.screen;
     };
 
     var keyboard = {
@@ -37,21 +35,23 @@ define(["model/canvas"], function (Canvas) {
         up: false,
         down: false
     };
+
     var mouse = {
         use: false,
         mdFlag: false,
-        pos: pos = {
+        pos: {
             x: 100,
             y: 100
         }
     };
+
     var Game = {
-        //functions
+        // functions
         generateStar: generateStar,
         addStars: addStars,
         getScreen: getScreen,
-        //variables
-        stars: stars = [],
+        // variables
+        stars: [],
         noStars: 300,
         screen: "",
         timer: 0,
@@ -65,15 +65,15 @@ define(["model/canvas"], function (Canvas) {
         lastScreen: "main_menu",
         paused: false,
         screenTooSmall: false,
-        //user settings
+        // user settings
         muteMusic: false,
         musicCreated: false,
         muteSFX: false,
         disableHelp: false,
-        //stats
+        // stats
         highscore: 0,
         isHighScore: false,
-        //enemies killed
+        // enemies killed
         scout: 0,
         fighter: 0,
         interceptor: 0,
