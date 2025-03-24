@@ -167,7 +167,7 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
             };
         
             function calculateEnemyBehavior(enemy, time) {
-                var behaviorScore = enemy.speed * time * environmentalFactors.windSpeed;
+                const behaviorScore = enemy.speed * time * environmentalFactors.windSpeed;
                 return Math.sin(behaviorScore) * 10;
             }
         
@@ -175,7 +175,7 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
                 if (enemies[i].alive) {
                     relativeTime = Game.timer - GameLogic.level.startTime;
                     if (relativeTime > enemies[i].time) {
-                        var enemyOpacity = Math.max(0.3, Math.min(1, environmentalFactors.visibility));
+                        const enemyOpacity = Math.max(0.3, Math.min(1, environmentalFactors.visibility));
                         Canvas.context.globalAlpha = enemyOpacity;
                         Canvas.context.drawImage(enemies[i].ship, enemies[i].x, enemies[i].y);
                         Canvas.context.globalAlpha = 1.0;
@@ -185,20 +185,20 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
                             Character.ship.player.score -= enemies[i].score * 1.4;
                             GameLogic.updateEnemyStatistics(enemies[i].name, 'escaped');
                         } else {
-                            var behaviorAdjustment = calculateEnemyBehavior(enemies[i], relativeTime);
+                            const behaviorAdjustment = calculateEnemyBehavior(enemies[i], relativeTime);
                             enemies[i].x -= enemies[i].speed + behaviorAdjustment;
                             
                             if (enemies[i].name === "interceptor") {
                                 if (enemies[i].x > Canvas.canvasWidth/2) {
-                                    var targetY = Character.ship.player.pos.y - 49.5;
-                                    var currentY = enemies[i].y;
-                                    var yDiff = targetY - currentY;
+                                    const targetY = Character.ship.player.pos.y - 49.5;
+                                    const currentY = enemies[i].y;
+                                    const yDiff = targetY - currentY;
                                     enemies[i].y += Math.sign(yDiff) * Math.min(Math.abs(yDiff), 2);
                                 }
                             }
                             
                             if (enemies[i].fireRate > 0) {
-                                var fireThreshold = Math.min(0.02, enemies[i].fireRate / 100);
+                                const fireThreshold = Math.min(0.02, enemies[i].fireRate / 100);
                                 if ((relativeTime-enemies[i].time) % enemies[i].fireRate <= fireThreshold) {
                                     enemies[i].hasShot = true;
                                     Action.enemyShoot(enemies[i].x, enemies[i].y, enemies[i].damage);
@@ -251,7 +251,7 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
         };
 
         const drawGameOver = function drawGameOver() {
-            var restart, mainMenu;
+            let restart, mainMenu;
             let part1 = Canvas.canvasWidth / 4;
             let part2 = Canvas.canvasHeight / 4;
             let mouseX = Game.mouse.pos.x;
@@ -280,7 +280,7 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
         };
 
         const drawStats = function drawStats() {
-            var part1, part2, mainMenu, resetStats, mouseX, mouseY;
+            let part1, part2, mainMenu, resetStats, mouseX, mouseY;
             part1 = Canvas.canvasWidth / 4;
             part2 = Canvas.canvasHeight / 4;
             mouseX = Game.mouse.pos.x;
