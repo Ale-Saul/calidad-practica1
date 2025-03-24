@@ -226,7 +226,7 @@ define(["model/images", "model/canvas", "model/game", "model/character", "contro
                     }
                 }
             }
-            for (i = 0; i < enemyBullets.length; i += 1) {
+            for (let j = 0; j < enemyBullets.length; j += 1) {
                 if (enemyBullets[i].alive) {
                     Canvas.context.drawImage(enemyBullets[i].type, enemyBullets[i].x, enemyBullets[i].y);
                     if (enemyBullets[i].x <= 0) {
