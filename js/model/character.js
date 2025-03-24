@@ -101,12 +101,12 @@ define(["model/images"], function (Images) {
         }
     };
 
-    var ship = {
+    let ship = {
         enemy: enemy,
         player: player
     };
 
-    var Character = {
+    let Character = {
         ship: ship
     };
 
