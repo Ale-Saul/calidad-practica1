@@ -4,22 +4,17 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         Game.timer = 0;
     };
 
-    const clone = (function () {
-        return function (obj) {
-            Clone.prototype = obj;
-            return new Clone();
-        };
-    })();
-
-    const startTimer = () => {
-        timerInterval = setInterval(() => {
+    const clone = function(obj) {
+        return Object.create(obj);
+    };
+    const startTimer = function startTimer() {
+        setInterval(function () {
             if (Game.levelStarted) {
-                Game.timer += 0.01;
-                GameLogic.addScore(2);
+                Game.timer += 0.01;  
+                GameLogic.addScore(2);  
             }
         }, 10);
     };
-    
 
     const addScore = function addScore(add) {
         Character.ship.player.score += add;
@@ -53,7 +48,7 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
 
     const checkEnemiesDead = function checkEnemiesDead() {
         let alive = 0;
-        const enemies = InPlay.enemies;
+        let enemies = InPlay.enemies;
         let i;
         if (enemies.length > 0 && !Game.gameOver) {
             for (i = 0; i < enemies.length; i++) {
@@ -71,49 +66,33 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         }
     };
 
-    const checkBulletCollision = () => {
-        const playerPos = Character.ship.player.pos;
-        const playerBullets = InPlay.playerBullets;
-        const enemyBullets = InPlay.enemyBullets;
-        const enemies = InPlay.enemies;
-    
-        playerBullets.forEach(bullet => {
-            if (bullet.alive) {
-                enemies.forEach(enemy => {
-                    if (enemy.alive && checkCollision(bullet, enemy)) {
-                        handlePlayerBulletHit(bullet, enemy);
+    const handlePlayerBulletCollision = function(bullet, enemies) {
+        for (let enemy of enemies) {
+            if (enemy.alive) {
+                if (
+                    bullet.x >= enemy.x &&
+                    bullet.x <= enemy.x + enemy.width &&
+                    bullet.y >= (enemy.y - 9) &&
+                    bullet.y <= enemy.y + enemy.height
+                ) {
+                    bullet.alive = false;
+                    enemy.hp -= bullet.damage;
+                    if (enemy.hp <= 0) {
+                        handleEnemyDeath(enemy);
                     }
-                });
+                }
             }
-        });
-    
-        enemyBullets.forEach(bullet => {
-            if (bullet.alive && checkPlayerBulletHit(bullet, playerPos)) {
-                handleEnemyBulletHit(bullet);
-            }
-        });
-    };
-    
-    const checkCollision = (bullet, enemy) => {
-        return bullet.x >= enemy.x && bullet.x <= enemy.x + enemy.width &&
-               bullet.y >= (enemy.y - 9) && bullet.y <= enemy.y + enemy.height;
-    };
-    
-    const handlePlayerBulletHit = (bullet, enemy) => {
-        bullet.alive = false;
-        enemy.hp -= bullet.damage;
-    
-        if (enemy.hp <= 0) {
-            if (!Game.muteSFX) {
-                Sounds.death.play();
-            }
-            enemy.alive = false;
-            GameLogic.addScore(enemy.score);
-            handleEnemyType(enemy);
         }
     };
     
-    const handleEnemyType = (enemy) => {
+
+    const handleEnemyDeath = function(enemy) {
+        if (!Game.muteSFX) {
+            Sounds.death.play();
+        }
+        enemy.alive = false;
+        GameLogic.addScore(enemy.score);
+    
         switch (enemy.name) {
             case "transport":
                 GameLogic.dropPickUp(enemy.x, enemy.y);
@@ -133,111 +112,146 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
                 break;
         }
     };
-    
-    const checkPlayerBulletHit = (bullet, playerPos) => {
-        return bullet.x >= playerPos.x - 13 && bullet.x <= playerPos.x + Character.ship.player.width &&
-               bullet.y >= playerPos.y - Character.ship.player.height / 2 && bullet.y <= playerPos.y + Character.ship.player.height / 2;
-    };
-    
-    const handleEnemyBulletHit = (bullet) => {
-        if (!Game.muteSFX) {
-            Sounds.playerHit.play();
-        }
-        bullet.alive = false;
-        Character.ship.player.hp -= bullet.damage;
-    
-        if (Character.ship.player.hp <= 0) {
-            if (!Game.muteSFX) {
-                Sounds.explosion.play();
-            }
-            GameLogic.gameOver();
-        }
-    };
-    
 
-    const dropPickUp = function dropPickUp(x, y) {
-        const selector = Math.floor(Math.random() * (3 - 1 + 1) + 1);
+    const handleEnemyBulletCollision = function(bullet, playerPos) {
+        if (
+            bullet.x >= playerPos.x - 13 &&
+            bullet.x <= playerPos.x + Character.ship.player.width &&
+            bullet.y >= playerPos.y - Character.ship.player.height / 2 &&
+            bullet.y <= playerPos.y + Character.ship.player.height / 2
+        ) {
+            if (!Game.muteSFX) {
+                Sounds.playerHit.play();
+            }
+            bullet.alive = false;
+            Character.ship.player.hp -= bullet.damage;
+            if (Character.ship.player.hp <= 0) {
+                if (!Game.muteSFX) {
+                    Sounds.explosion.play();
+                }
+                GameLogic.gameOver();
+            }
+        }
+    };
+
+    const checkBulletCollision = function checkBulletCollision() {
+        const enemyBullets = InPlay.enemyBullets;
+        const playerPos = Character.ship.player.pos;
+        const playerBullets = InPlay.playerBullets;
+        const enemies = InPlay.enemies;
+        for (let bullet of playerBullets) {
+            if (bullet.alive) {
+                handlePlayerBulletCollision(bullet, enemies);
+            }
+        }
+
+        for (let bullet of enemyBullets) {
+            if (bullet.alive) {
+                handleEnemyBulletCollision(bullet, playerPos);
+            }
+        }
+    };
+
+        
+    const getRandomInt = (max) => {
+        const array = new Uint32Array(1);
+        window.crypto.getRandomValues(array);
+        return (array[0] % max) + 1; 
+    };
+
+    const dropPickUp = (x, y) => {
+        const selector = getRandomInt(3);
+
         const pickUp = {
             x: x,
             y: y + 45,
             alive: true
         };
-        if (selector === 1) {
-            pickUp.type = "health";
-            pickUp.icon = Images.pickUpHealth;
-        } else if (selector === 2) {
-            pickUp.type = "fireRate";
-            pickUp.icon = Images.pickUpFireRate;
-        } else if (selector === 3) {
-            pickUp.type = "damage";
-            pickUp.icon = Images.pickUpDamage;
+        switch (selector) {
+            case 1:
+                pickUp.type = "health";
+                pickUp.icon = Images.pickUpHealth;
+                break;
+            case 2:
+                pickUp.type = "fireRate";
+                pickUp.icon = Images.pickUpFireRate;
+                break;
+            case 3:
+                pickUp.type = "damage";
+                pickUp.icon = Images.pickUpDamage;
+                break;
+            default:
+                throw new Error('Selector fuera de rango');
         }
         InPlay.powerUps.push(pickUp);
     };
 
-    const checkPickUp = () => {
+
+    const isInPickupArea = (powerUp, player) => {
+        return (powerUp.x >= player.pos.x && powerUp.x <= (player.pos.x + player.width)) &&
+               (powerUp.y >= (player.pos.y - player.height) && powerUp.y <= player.pos.y + player.height / 2);
+    };
+
+    const applyPowerUp = (powerUp, player) => {
+        switch (powerUp.type) {
+            case "health":
+                player.hp += 20;
+                break;
+            case "fireRate":
+                player.fireRate -= 0.09;
+                GameLogic.fRate = true;
+                break;
+            case "damage":
+                player.damage += 1;
+                break;
+        }
+    };
+
+    const checkPickUp = function() {
         const powerUps = InPlay.powerUps;
         const player = Character.ship.player;
     
-        powerUps.forEach(powerUp => {
-            if (powerUp.alive && isCollidingWithPlayer(powerUp, player)) {
+        for (const powerUp of powerUps) {
+            if (powerUp.alive && isInPickupArea(powerUp, player)) {
                 if (!Game.muteSFX) {
                     Sounds.powerUp.play();
                 }
-    
                 applyPowerUp(powerUp, player);
                 powerUp.alive = false;
             }
-        });
-    };
-    
-    const isCollidingWithPlayer = (powerUp, player) => {
-        return powerUp.x >= player.pos.x && powerUp.x <= (player.pos.x + player.width) &&
-               powerUp.y >= (player.pos.y - player.height) && powerUp.y <= player.pos.y + player.height / 2;
-    };
-    
-    const applyPowerUp = (powerUp, player) => {
-        const powerUpActions = {
-            health: () => player.hp += 20,
-            fireRate: () => {
-                player.fireRate -= 0.09;
-                GameLogic.fRate = true;
-            },
-            damage: () => player.damage += 1
-        };
-    
-        if (powerUpActions[powerUp.type]) {
-            powerUpActions[powerUp.type]();
         }
     };
     
-
-    const checkShipCollision = () => {
-        const player = Character.ship.player;
-        const playerPos = player.pos;
-    
-        InPlay.enemies.forEach(enemy => {
-            if (enemy.alive && player.hp > 0 && isColliding(playerPos, player, enemy)) {
-                handleCollision(enemy, player);
+    const checkShipCollision = function checkShipCollision() {
+        let enemies = InPlay.enemies;
+        let player = Character.ship.player;
+        let playerPos = Character.ship.player.pos;
+        
+        enemies.forEach(enemy => {
+            if (player.hp > 0 && enemy.alive) {
+                if (isColliding(playerPos, player.width, enemy)) {
+                    handleCollision(player, enemy);
+                }
             }
         });
     };
-    
-    const isColliding = (playerPos, player, enemy) => {
-        const isXColliding = (enemy.x >= playerPos.x && enemy.x <= playerPos.x + player.width) || 
-                             (enemy.x + enemy.width >= playerPos.x && enemy.x + enemy.width <= playerPos.x + player.width);
-        const isYColliding = (enemy.y >= playerPos.y - player.height && enemy.y <= playerPos.y + player.height / 2) ||
-                             (playerPos.y - player.height / 2 >= enemy.y && playerPos.y - player.height / 2 <= enemy.y + enemy.height);
-    
+
+    const isColliding = function (playerPos, playerWidth, enemy) {
+        const isXColliding = (enemy.x >= playerPos.x && enemy.x <= (playerPos.x + playerWidth)) ||
+                             (enemy.x + enemy.width >= playerPos.x && enemy.x + enemy.width <= (playerPos.x + playerWidth));
+        
+        const isYColliding = (enemy.y >= (playerPos.y - Character.ship.player.height) && enemy.y <= (playerPos.y + Character.ship.player.height / 2)) ||
+                             ((playerPos.y - Character.ship.player.height / 2) >= enemy.y && (playerPos.y - Character.ship.player.height / 2) <= (enemy.y + enemy.height));
+        
         return isXColliding && isYColliding;
     };
     
-    const handleCollision = (enemy, player) => {
+    const handleCollision = function (player, enemy) {
         if (!Game.muteSFX) {
             Sounds.playerHit.play();
             Sounds.death.play();
         }
-    
+        
         enemy.alive = false;
         player.hp -= enemy.hp;
     
@@ -248,25 +262,21 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
             GameLogic.gameOver();
         }
     };
-    
 
-    const gameOver = function gameOver() { 
-        const isHighscore = false; 
-        const enemies = InPlay.enemies; 
+    const gameOver = function gameOver() {
+        let isHighscore = false;
+        let enemies = InPlay.enemies;
         GameLogic.timer.stop();
         enemies.length = 0;
         Game.levelStarted = false;
         Game.gameOver = true;
-    
         if (Game.highscore < Character.ship.player.score) {
             isHighscore = true;
             Game.highscore = Character.ship.player.score;
         }
-    
         GameLogic.uploadStats(isHighscore);
         Game.screen = "game_over";
     };
-    
 
     const uploadStats = function uploadStats(isHighscore) {
         if (isHighscore) {
@@ -275,14 +285,12 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         } else {
             Game.isHighscore = false;
         }
-    
         LSM.set("scout", Game.scout);
         LSM.set("fighter", Game.fighter);
         LSM.set("interceptor", Game.interceptor);
         LSM.set("tank", Game.tank);
         LSM.set("transport", Game.transport);
     };
-    
 
     const resetStats = function resetStats() {
         Game.highscore = 0;
@@ -307,16 +315,16 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
     };
 
     const spawnCheck = function spawnCheck(newShip, spawnTime) {
-        let verdict = true;
-        let time = spawnTime;
-        let spawningY = newShip;
-        const enemies = InPlay.enemies;
+        let  i, enemies, spawningY, verdict, time;
+        verdict = true;
+        time = spawnTime;
+        spawningY = newShip;
+        enemies = InPlay.enemies;
         if (enemies.length >= 1) {
-            for (let i = 0; i < enemies.length; i++) {
+            for (i = 0; i < enemies.length; i++) {
                 if (time < enemies[i].time + 1) {
                     if (spawningY > enemies[i].y - 104 && spawningY < enemies[i].y + 104) {
                         verdict = false;
-                        break;
                     }
                 }
             }
@@ -325,59 +333,69 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
     };
 
     const addEnemies = function addEnemies() {
-        const noEnemies = Game.level * 5;
-        const lvlSelector = Game.level <= 5 ? Game.level : 5;
-        const rate = Game.level < 6 ? 1 : 0.5;
+        const baseEnemies = 5; 
+        const maxEnemies = 30;
+        const enemyIncreaseRate = 2; 
+    
+        const noEnemies = Math.min(baseEnemies + (Game.level - 1) * enemyIncreaseRate, maxEnemies);
+        
+        const lvlSelector = Math.min(Game.level, 5);
+        const rate = Math.max(0.5, 1 - (Game.level * 0.05)); 
         let time = 0;
-        let enemiesAdded = 0;
         GameLogic.level.startTime = Game.timer;
     
-        while (enemiesAdded < noEnemies) {
-            const enemy = createEnemy(lvlSelector);
-            const y = Math.floor(Math.random() * (Canvas.canvasHeight - 90)) + 1;
+        let enemiesSpawned = 0;
+        while (enemiesSpawned < noEnemies) {
+            const enemy = selectEnemy(lvlSelector);
+            const y = Math.floor(Math.random() * (Canvas.canvasHeight - 90)) + 1; //NOSONAR
             
             if (GameLogic.spawnCheck(y, time)) {
-                const x = Canvas.canvasWidth + 100;
-                setupEnemy(enemy, x, y, time, rate);
+                spawnEnemy(enemy, y, time);
                 time += rate;
-                InPlay.enemies.push(enemy);
-                enemiesAdded++;
+                enemiesSpawned++;
             }
         }
     };
-    
-    const createEnemy = (lvlSelector) => {
-        const selector = Math.floor(Math.random() * lvlSelector) + 1;
-        switch (selector) {
-            case 1: return GameLogic.clone(Character.ship.enemy.scout);
-            case 2: return GameLogic.clone(Character.ship.enemy.fighter);
-            case 3: 
-                return Game.level % 3 === 0 
-                    ? GameLogic.clone(Character.ship.enemy.transport) 
-                    : GameLogic.clone(Character.ship.enemy.scout);
-            case 4: return GameLogic.clone(Character.ship.enemy.tank);
-            case 5: return GameLogic.clone(Character.ship.enemy.interceptor);
-            default: return GameLogic.clone(Character.ship.enemy.scout); 
+
+    function selectEnemy(lvlSelector) {
+        const selector = Math.floor(Math.random() * lvlSelector) + 1; // NOSONAR
+        const enemyTypes = [
+            Character.ship.enemy.scout,
+            Character.ship.enemy.fighter,
+            Character.ship.enemy.scout, 
+            Character.ship.enemy.tank,
+            Character.ship.enemy.interceptor
+        ];
+        
+        let selectedEnemy = enemyTypes[selector - 1] || Character.ship.enemy.scout;
+        
+        if (Game.level % 3 === 0 && Math.random() < 0.2) { // NOSONAR
+            selectedEnemy = Character.ship.enemy.transport;
         }
-    };
+        
+        return GameLogic.clone(selectedEnemy);
+    }
     
-    const setupEnemy = (enemy, x, y, time, rate) => {
-        enemy.x = x;
+    function spawnEnemy(enemy, y, time) {
         enemy.y = y;
-        enemy.hp += Game.level * (Math.floor(Game.level / 2) - 1);
+        enemy.x = Canvas.canvasWidth + 100;
+
+        const hpIncrease = Math.floor(Math.sqrt(Game.level)) - 1;
+        enemy.hp += Math.max(0, hpIncrease);
+        
         enemy.time = time;
-    };
-    
+        InPlay.enemies.push(enemy);
+    }
 
     const level = {
-        // functions
+        //functions
         start: startLevel,
-        // variables
+        //variables
         startTime: 0
     };
-    
+
     const GameLogic = {
-        // functions
+        //functions
         clone: clone,
         spawnCheck: spawnCheck,
         addEnemies: addEnemies,
@@ -391,13 +409,11 @@ define(["model/game", "model/character", "model/inPlay", "model/canvas", "model/
         gameOver: gameOver,
         uploadStats: uploadStats,
         resetStats: resetStats,
-        // variables
+        //variables
         paused: false,
-        fRate: false,
+	    fRate: false,
         level: level,
         timer: timer
     };
-    
     return GameLogic;
-    
 });
