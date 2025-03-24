@@ -18,7 +18,7 @@ define(["model/game"], function (Game) {
                 }
             });
         } else {
-            console.log("nolocalstorage sup"); // TODO
+            console.log("nolocalstorage sup"); 
         }
     };
     
